@@ -4,6 +4,7 @@ import express from "express";
 import pool from "./config/db.js";
 
 import authRoutes from "./routes/auth.routes.js";
+import movieRoutes from "./routes/movie.routes.js";
 
 dotenv.config();
 
@@ -27,6 +28,9 @@ app.get("/api", (req, res) => {
 
 // Rutas de autenticación
 app.use("/api/auth", authRoutes);
+
+// Rutas de películas
+app.use("/api/movie", movieRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
