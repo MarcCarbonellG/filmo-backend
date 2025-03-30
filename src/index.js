@@ -1,7 +1,11 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const pool = require("./db");
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import pool from "./config/db.js";
+
+import authRoutes from "./routes/auth.routes.js";
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -20,6 +24,9 @@ app.get("/api/db-test", async (req, res) => {
 app.get("/api", (req, res) => {
   res.send("Hello from Express!");
 });
+
+// Rutas de autenticación
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
