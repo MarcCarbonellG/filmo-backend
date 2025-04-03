@@ -2,10 +2,13 @@ import axios from "axios";
 import dotenv from "dotenv";
 import {
   addToFav,
+  addToWatched,
   createMovie,
-  findFavById,
+  findFavorite,
   findMovieById,
+  findWatched,
   removeFav,
+  removeFromWatched,
 } from "../services/movie.service.js";
 
 dotenv.config();
@@ -76,20 +79,20 @@ export const addMovieToFav = async (req, res) => {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    const movie_fav = await findFavById(user_id, movie_id);
+    let movie_fav = await findFavorite(user_id, movie_id);
 
     if (movie_fav) {
       return res.status(400).json({
         message: "Selected movie was already in favorites",
       });
     } else {
-      const movie = await findMovieById(movie_id);
+      let movie = await findMovieById(movie_id);
 
       if (!movie) {
         movie = await createMovie(movie_id, title, year, image);
       }
 
-      const movie_fav = await addToFav(user_id, movie_id);
+      movie_fav = await addToFav(user_id, movie_id);
 
       res.status(201).json({
         message: "Movie successfully added to favorites",
@@ -103,19 +106,19 @@ export const addMovieToFav = async (req, res) => {
 };
 
 export const removeMovieFav = async (req, res) => {
-  const { id } = req.params;
+  const { user_id, movie_id } = req.body;
 
   try {
-    if (!id) {
+    if (!user_id || !movie_id) {
       return res
         .status(400)
-        .json({ message: "Bad request, movie_fav_id is required" });
+        .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    const movie_fav = await findFavById(id);
+    const movie_fav = await findFavorite(user_id, movie_id);
 
     if (movie_fav) {
-      await removeFav(id);
+      await removeFav(user_id, movie_id);
     } else {
       return res.status(400).json({
         message: "Selected movie was not in favorites",
@@ -128,6 +131,70 @@ export const removeMovieFav = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in removeMovieFav:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const addMovieToWatched = async (req, res) => {
+  const { user_id, movie_id, title, year, image } = req.body;
+
+  try {
+    if (!user_id || !movie_id || !title || !year || !image) {
+      return res.status(400).json({ message: "Bad request" });
+    }
+
+    let movie_watched = await findWatched(user_id, movie_id);
+
+    if (movie_watched) {
+      return res.status(400).json({
+        message: "Selected movie was already in watched",
+      });
+    } else {
+      let movie = await findMovieById(movie_id);
+
+      if (!movie) {
+        movie = await createMovie(movie_id, title, year, image);
+      }
+
+      movie_watched = await addToWatched(user_id, movie_id);
+
+      res.status(201).json({
+        message: "Movie successfully added to watched",
+        data: { movie_watched, movie },
+      });
+    }
+  } catch (error) {
+    console.error("Error in addMovieToWatched:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const removeMovieWatched = async (req, res) => {
+  const { user_id, movie_id } = req.body;
+
+  try {
+    if (!user_id || !movie_id) {
+      return res
+        .status(400)
+        .json({ message: "Bad request, user_id and movie_id are required" });
+    }
+
+    const movie_watched = await findWatched(user_id, movie_id);
+
+    if (movie_watched) {
+      await removeFromWatched(user_id, movie_id);
+    } else {
+      return res.status(400).json({
+        message: "Selected movie was not in watched",
+      });
+    }
+
+    res.status(201).json({
+      message: "Movie successfully removed from watched",
+      data: movie_watched,
+    });
+  } catch (error) {
+    console.error("Error in removeMovieWatched:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -1,9 +1,11 @@
 import express from "express";
 import {
   addMovieToFav,
+  addMovieToWatched,
   getMovieById,
   getMovieList,
   removeMovieFav,
+  removeMovieWatched,
   searchMoviesByTitle,
 } from "../controllers/movie.controller.js";
 
@@ -22,6 +24,12 @@ router.get("/list/:listName?", getMovieList);
 router.post("/fav", addMovieToFav);
 
 // Remove movie from favourites
-router.delete("/fav/:id", removeMovieFav);
+router.delete("/fav", removeMovieFav);
+
+// Add movie to watched
+router.post("/watched", addMovieToWatched);
+
+// Remove movie from watched
+router.delete("/watched", removeMovieWatched);
 
 export default router;
