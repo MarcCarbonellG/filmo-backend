@@ -7,9 +7,8 @@ import {
 } from "../services/user.service.js";
 
 const registerUser = async (req, res) => {
+  const { username, email, password } = req.body;
   try {
-    const { username, email, password } = req.body;
-
     if (!username || !email || !password) {
       return res
         .status(400)
@@ -27,9 +26,11 @@ const registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await createUser(username, email, hashedPassword);
+    const user = await createUser(username, email, hashedPassword);
 
-    res.status(201).json({ message: "User successfully registered" });
+    res
+      .status(201)
+      .json({ message: "User successfully registered", data: user });
   } catch (error) {
     console.error("Error in registerUser:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -37,9 +38,8 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+  const { username, password } = req.body;
   try {
-    const { username, password } = req.body;
-
     if (!username || !password) {
       return res
         .status(400)

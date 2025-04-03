@@ -15,10 +15,12 @@ const findUserByUsername = async (username) => {
 };
 
 const createUser = async (username, email, hashedPassword) => {
-  return pool.query(
+  const { rows } = await pool.query(
     "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)",
     [username, email, hashedPassword]
   );
+
+  return rows[0];
 };
 
 export { createUser, findUserByEmail, findUserByUsername };
