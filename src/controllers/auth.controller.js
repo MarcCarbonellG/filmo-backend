@@ -47,14 +47,14 @@ const loginUser = async (req, res) => {
     }
 
     const user = await findUserByUsername(username);
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await bcrypt.compare(password, user?.password))) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign({ username }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.json({ message: "Session successfully started", token });
+    res.json({ message: "Session successfully started", token, user });
   } catch (error) {
     console.error("Error in loginUser:", error);
     res.status(500).json({ message: "Internal server error" });
