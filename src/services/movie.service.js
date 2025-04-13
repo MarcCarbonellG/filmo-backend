@@ -20,7 +20,10 @@ const isValidMovie = (movie) => {
 
   return requiredProps.every(
     (prop) =>
-      movie.hasOwnProperty(prop) && movie[prop] !== null && movie[prop] !== ""
+      movie.hasOwnProperty(prop) &&
+      movie[prop] !== null &&
+      movie[prop] !== "" &&
+      !(Array.isArray(movie[prop]) && movie[prop].length === 0)
   );
 };
 
