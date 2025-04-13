@@ -1,5 +1,33 @@
 import pool from "../config/db.js";
 
+const isValidMovie = (movie) => {
+  const requiredProps = [
+    "adult",
+    "backdrop_path",
+    "genre_ids",
+    "id",
+    "original_language",
+    "original_title",
+    "overview",
+    "popularity",
+    "poster_path",
+    "release_date",
+    "title",
+    "video",
+    "vote_average",
+    "vote_count",
+  ];
+
+  return requiredProps.every(
+    (prop) =>
+      movie.hasOwnProperty(prop) && movie[prop] !== null && movie[prop] !== ""
+  );
+};
+
+const filterValidMovies = (movies) => {
+  return movies.filter((movie) => isValidMovie(movie));
+};
+
 const findMovieById = async (id) => {
   const { rows } = await pool.query("SELECT * FROM movies WHERE id = $1", [id]);
   return rows[0];
@@ -65,9 +93,11 @@ export {
   addToFav,
   addToWatched,
   createMovie,
+  filterValidMovies,
   findFavorite,
   findMovieById,
   findWatched,
+  isValidMovie,
   removeFav,
   removeFromWatched,
 };

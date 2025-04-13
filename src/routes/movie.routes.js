@@ -2,6 +2,8 @@ import express from "express";
 import {
   addMovieToFav,
   addMovieToWatched,
+  getGenres,
+  getLanguages,
   getMovieById,
   getMovieList,
   removeMovieFav,
@@ -31,5 +33,11 @@ router.post("/watched", addMovieToWatched);
 
 // Remove movie from watched
 router.delete("/watched", removeMovieWatched);
+
+// Get genres
+router.get("/genres", getGenres);
+
+// Get languages
+router.get("/languages", getLanguages);
 
 export default router;

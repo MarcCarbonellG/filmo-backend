@@ -4,6 +4,7 @@ import {
   addToFav,
   addToWatched,
   createMovie,
+  filterValidMovies,
   findFavorite,
   findMovieById,
   findWatched,
@@ -27,7 +28,7 @@ export const searchMoviesByTitle = async (req, res) => {
       params: { api_key: TMDB_API_KEY, query, language: "es-ES" },
     });
 
-    res.json(response.data.results);
+    res.json(filterValidMovies(response.data.results));
   } catch (error) {
     console.error("Error fetching movies:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -195,6 +196,35 @@ export const removeMovieWatched = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in removeMovieWatched:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getGenres = async (req, res) => {
+  try {
+    const response = await axios.get(`${TMDB_BASE_URL}/genre/movie/list`, {
+      params: { api_key: TMDB_API_KEY, language: "es-ES" },
+    });
+
+    res.json(response.data.genres);
+  } catch (error) {
+    console.error("Error fetching genres:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getLanguages = async (req, res) => {
+  try {
+    const response = await axios.get(
+      `${TMDB_BASE_URL}/configuration/languages`,
+      {
+        params: { api_key: TMDB_API_KEY },
+      }
+    );
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching genres:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
