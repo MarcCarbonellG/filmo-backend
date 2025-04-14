@@ -1,6 +1,6 @@
 import pool from "../config/db.js";
 
-const isValidMovie = (movie) => {
+export const isValidMovie = (movie) => {
   const requiredProps = [
     "adult",
     "backdrop_path",
@@ -27,24 +27,24 @@ const isValidMovie = (movie) => {
   );
 };
 
-const filterValidMovies = (movies) => {
+export const filterValidMovies = (movies) => {
   return movies.filter((movie) => isValidMovie(movie));
 };
 
-const findMovieById = async (id) => {
+export const findMovieById = async (id) => {
   const { rows } = await pool.query("SELECT * FROM movies WHERE id = $1", [id]);
   return rows[0];
 };
 
-const createMovie = async (id, title, year, image) => {
+export const createMovie = async (id, title, release_date, poster) => {
   const { rows } = await pool.query(
-    "INSERT INTO movies (id, title, year, image) VALUES ($1, $2, $3, $4)",
-    [id, title, year, image]
+    "INSERT INTO movies (id, title, release_date, poster) VALUES ($1, $2, $3, $4)",
+    [id, title, release_date, poster]
   );
   return rows[0];
 };
 
-const findFavorite = async (user_id, movie_id) => {
+export const findFavorite = async (user_id, movie_id) => {
   const { rows } = await pool.query(
     "SELECT * FROM movie_fav WHERE user_id = $1 AND movie_id = $2",
     [user_id, movie_id]
@@ -52,7 +52,7 @@ const findFavorite = async (user_id, movie_id) => {
   return rows[0];
 };
 
-const addToFav = async (user_id, movie_id) => {
+export const addToFav = async (user_id, movie_id) => {
   const { rows } = await pool.query(
     "INSERT INTO movie_fav (user_id, movie_id) VALUES ($1, $2) RETURNING *",
     [user_id, movie_id]
@@ -60,7 +60,7 @@ const addToFav = async (user_id, movie_id) => {
   return rows[0];
 };
 
-const removeFav = async (user_id, movie_id) => {
+export const removeFav = async (user_id, movie_id) => {
   const { rows } = await pool.query(
     "DELETE FROM movie_fav WHERE user_id = $1 AND movie_id = $2 RETURNING *",
     [user_id, movie_id]
@@ -68,7 +68,7 @@ const removeFav = async (user_id, movie_id) => {
   return rows[0];
 };
 
-const findWatched = async (user_id, movie_id) => {
+export const findWatched = async (user_id, movie_id) => {
   const { rows } = await pool.query(
     "SELECT * FROM movie_watched WHERE user_id = $1 AND movie_id = $2",
     [user_id, movie_id]
@@ -76,7 +76,7 @@ const findWatched = async (user_id, movie_id) => {
   return rows[0];
 };
 
-const addToWatched = async (user_id, movie_id) => {
+export const addToWatched = async (user_id, movie_id) => {
   const { rows } = await pool.query(
     "INSERT INTO movie_watched (user_id, movie_id) VALUES ($1, $2) RETURNING *",
     [user_id, movie_id]
@@ -84,7 +84,7 @@ const addToWatched = async (user_id, movie_id) => {
   return rows[0];
 };
 
-const removeFromWatched = async (user_id, movie_id) => {
+export const removeFromWatched = async (user_id, movie_id) => {
   const { rows } = await pool.query(
     "DELETE FROM movie_watched WHERE user_id = $1 AND movie_id = $2 RETURNING *",
     [user_id, movie_id]
@@ -92,15 +92,34 @@ const removeFromWatched = async (user_id, movie_id) => {
   return rows[0];
 };
 
-export {
-  addToFav,
-  addToWatched,
-  createMovie,
-  filterValidMovies,
-  findFavorite,
-  findMovieById,
-  findWatched,
-  isValidMovie,
-  removeFav,
-  removeFromWatched,
+export const findReview = async (user_id, movie_id) => {
+  const { rows } = await pool.query(
+    "SELECT reviews.*, users.username, users.avatar FROM reviews JOIN users ON reviews.user_id = users.id WHERE reviews.user_id = $1 AND reviews.movie_id = $2",
+    [user_id, movie_id]
+  );
+  return rows[0];
+};
+
+export const addReview = async (user_id, movie_id, rating, content) => {
+  const { rows } = await pool.query(
+    "INSERT INTO reviews (user_id, movie_id, rating, content) VALUES ($1, $2, $3, $4) RETURNING *",
+    [user_id, movie_id, rating, content]
+  );
+  return rows[0];
+};
+
+export const removeReview = async (user_id, movie_id) => {
+  const { rows } = await pool.query(
+    "DELETE FROM reviews WHERE user_id = $1 AND movie_id = $2 RETURNING *",
+    [user_id, movie_id]
+  );
+  return rows[0];
+};
+
+export const getReviews = async (movie_id) => {
+  const { rows } = await pool.query(
+    "SELECT reviews.*, users.username, users.avatar FROM reviews JOIN users ON reviews.user_id = users.id WHERE reviews.movie_id = $1",
+    [movie_id]
+  );
+  return rows;
 };
