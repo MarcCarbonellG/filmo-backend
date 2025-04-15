@@ -1,15 +1,17 @@
 import express from "express";
 import {
   addMovieReview,
-  addMovieToFav,
+  addMovieToFavorites,
   addMovieToWatched,
-  findMovieReview,
+  getApiMovieById,
   getGenres,
   getLanguages,
-  getMovieById,
+  getMovieFavorites,
   getMovieList,
+  getMovieReview,
   getMovieReviews,
-  removeMovieFav,
+  getMovieWatched,
+  removeMovieFavorite,
   removeMovieReview,
   removeMovieWatched,
   searchMoviesByTitle,
@@ -21,16 +23,22 @@ const router = express.Router();
 router.get("/search", searchMoviesByTitle);
 
 // Get a movie by id
-router.get("/:id([0-9]+)", getMovieById);
+router.get("/:id([0-9]+)", getApiMovieById);
 
 // Get a list of movies (now playing, popular, top rated or upcoming)
 router.get("/list/:listName?", getMovieList);
 
-// Add movie to favourites
-router.post("/fav", addMovieToFav);
+// Get movie favorites
+router.get("/fav/:movie_id([0-9]+)", getMovieFavorites);
 
-// Remove movie from favourites
-router.delete("/fav", removeMovieFav);
+// Add movie to favorites
+router.post("/fav", addMovieToFavorites);
+
+// Remove movie from favorites
+router.delete("/fav", removeMovieFavorite);
+
+// Get movie watched array
+router.get("/watched/:movie_id([0-9]+)", getMovieWatched);
 
 // Add movie to watched
 router.post("/watched", addMovieToWatched);
@@ -51,7 +59,7 @@ router.post("/review", addMovieReview);
 router.delete("/review", removeMovieReview);
 
 // Get movie review
-router.get("/review", findMovieReview);
+router.get("/review", getMovieReview);
 
 // Get movie review
 router.get("/review/:movie_id([0-9]+)", getMovieReviews);

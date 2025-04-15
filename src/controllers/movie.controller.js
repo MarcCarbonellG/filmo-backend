@@ -2,16 +2,18 @@ import axios from "axios";
 import dotenv from "dotenv";
 import {
   addReview,
-  addToFav,
+  addToFavorites,
   addToWatched,
   createMovie,
   filterValidMovies,
-  findFavorite,
-  findMovieById,
-  findReview,
-  findWatched,
+  getFavorite,
+  getFavorites,
+  getMovieById,
+  getReview,
   getReviews,
-  removeFav,
+  getWatched,
+  getWatchedArray,
+  removeFavorite,
   removeFromWatched,
   removeReview,
 } from "../services/movie.service.js";
@@ -39,7 +41,7 @@ export const searchMoviesByTitle = async (req, res) => {
   }
 };
 
-export const getMovieById = async (req, res) => {
+export const getApiMovieById = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -76,28 +78,57 @@ export const getMovieList = async (req, res) => {
   }
 };
 
-export const addMovieToFav = async (req, res) => {
-  const { user_id, movie_id, title, release_date, poster } = req.body;
+export const getMovieFavorites = async (req, res) => {
+  const { movie_id } = req.params;
 
   try {
-    if (!user_id || !movie_id || !title || !date || !poster) {
+    if (!movie_id) {
+      return res
+        .status(400)
+        .json({ message: "Bad request. Movie id is required" });
+    }
+
+    const movie_favs = await getFavorites(movie_id);
+
+    return res.json(movie_favs);
+  } catch (error) {
+    console.error("Error in getMovieFavorites:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const addMovieToFavorites = async (req, res) => {
+  const { user_id, movie_id } = req.body;
+
+  try {
+    if (!user_id || !movie_id) {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    let movie_fav = await findFavorite(user_id, movie_id);
+    let movie_fav = await getFavorite(user_id, movie_id);
 
     if (movie_fav) {
       return res.status(400).json({
         message: "Selected movie was already in favorites",
       });
     } else {
-      let movie = await findMovieById(movie_id);
+      let movie = await getMovieById(movie_id);
 
       if (!movie) {
-        movie = await createMovie(movie_id, title, release_date, poster);
+        movie_data = await getApiMovieById(movie_id);
+        if (movie_data) {
+          movie = await createMovie(
+            movie_id,
+            movie_data.title,
+            movie_data.release_date,
+            movie_data.poster
+          );
+        } else {
+          res.status(404).json({ message: "Movie not found" });
+        }
       }
 
-      movie_fav = await addToFav(user_id, movie_id);
+      movie_fav = await addToFavorites(user_id, movie_id);
 
       res.status(201).json({
         message: "Movie successfully added to favorites",
@@ -110,7 +141,7 @@ export const addMovieToFav = async (req, res) => {
   }
 };
 
-export const removeMovieFav = async (req, res) => {
+export const removeMovieFavorite = async (req, res) => {
   const { user_id, movie_id } = req.body;
 
   try {
@@ -120,10 +151,10 @@ export const removeMovieFav = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    const movie_fav = await findFavorite(user_id, movie_id);
+    const movie_fav = await getFavorite(user_id, movie_id);
 
     if (movie_fav) {
-      await removeFav(user_id, movie_id);
+      await removeFavorite(user_id, movie_id);
     } else {
       return res.status(400).json({
         message: "Selected movie was not in favorites",
@@ -140,25 +171,54 @@ export const removeMovieFav = async (req, res) => {
   }
 };
 
-export const addMovieToWatched = async (req, res) => {
-  const { user_id, movie_id, title, release_date, poster } = req.body;
+export const getMovieWatched = async (req, res) => {
+  const { movie_id } = req.params;
 
   try {
-    if (!user_id || !movie_id || !title || !date || !poster) {
+    if (!movie_id) {
+      return res
+        .status(400)
+        .json({ message: "Bad request. Movie id is required" });
+    }
+
+    const movie_watched = await getWatchedArray(movie_id);
+
+    return res.json(movie_watched);
+  } catch (error) {
+    console.error("Error in getMovieWatched:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const addMovieToWatched = async (req, res) => {
+  const { user_id, movie_id } = req.body;
+
+  try {
+    if (!user_id || !movie_id) {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    let movie_watched = await findWatched(user_id, movie_id);
+    let movie_watched = await getWatched(user_id, movie_id);
 
     if (movie_watched) {
       return res.status(400).json({
         message: "Selected movie was already in watched",
       });
     } else {
-      let movie = await findMovieById(movie_id);
+      let movie = await getMovieById(movie_id);
 
       if (!movie) {
-        movie = await createMovie(movie_id, title, release_date, poster);
+        movie_data = await getApiMovieById(movie_id);
+        if (movie_data) {
+          movie = await createMovie(
+            movie_id,
+            movie_data.title,
+            movie_data.release_date,
+            movie_data.poster
+          );
+        } else {
+          res.status(404).json({ message: "Movie not found" });
+        }
       }
 
       movie_watched = await addToWatched(user_id, movie_id);
@@ -184,7 +244,7 @@ export const removeMovieWatched = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    const movie_watched = await findWatched(user_id, movie_id);
+    const movie_watched = await getWatched(user_id, movie_id);
 
     if (movie_watched) {
       await removeFromWatched(user_id, movie_id);
@@ -234,32 +294,34 @@ export const getLanguages = async (req, res) => {
 };
 
 export const addMovieReview = async (req, res) => {
-  const { user_id, movie_id, title, release_date, poster, rating, content } =
-    req.body;
+  const { user_id, movie_id, rating, content } = req.body;
 
   try {
-    if (
-      !user_id ||
-      !movie_id ||
-      !title ||
-      !release_date ||
-      !poster ||
-      !rating
-    ) {
+    if (!user_id || !movie_id || !rating) {
       return res.status(400).json({ message: "Bad request" });
     }
 
-    let movie_review = await findReview(user_id, movie_id);
+    let movie_review = await getReview(user_id, movie_id);
 
     if (movie_review) {
       return res.status(400).json({
         message: "Selected movie was already reviewed",
       });
     } else {
-      let movie = await findMovieById(movie_id);
+      let movie = await getMovieById(movie_id);
 
       if (!movie) {
-        movie = await createMovie(movie_id, title, release_date, poster);
+        movie_data = await getApiMovieById(movie_id);
+        if (movie_data) {
+          movie = await createMovie(
+            movie_id,
+            movie_data.title,
+            movie_data.release_date,
+            movie_data.poster
+          );
+        } else {
+          res.status(404).json({ message: "Movie not found" });
+        }
       }
 
       movie_review = await addReview(user_id, movie_id, rating, content);
@@ -285,7 +347,7 @@ export const removeMovieReview = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    const movie_review = await findReview(user_id, movie_id);
+    const movie_review = await getReview(user_id, movie_id);
 
     if (movie_review) {
       await removeReview(user_id, movie_id);
@@ -305,7 +367,7 @@ export const removeMovieReview = async (req, res) => {
   }
 };
 
-export const findMovieReview = async (req, res) => {
+export const getMovieReview = async (req, res) => {
   const { user_id, movie_id } = req.body;
 
   try {
@@ -315,7 +377,7 @@ export const findMovieReview = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    const response = await findReview(user_id, movie_id);
+    const response = await getReview(user_id, movie_id);
 
     if (!response) {
       return res.status(404).json({ message: "Review not found" });
@@ -323,7 +385,7 @@ export const findMovieReview = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error("Error in findMovieReview:", error);
+    console.error("Error in getMovieReview:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
