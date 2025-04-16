@@ -5,6 +5,7 @@ import pool from "./config/db.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import movieRoutes from "./routes/movie.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -31,6 +32,9 @@ app.use("/api/auth", authRoutes);
 
 // Rutas de películas
 app.use("/api/movie", movieRoutes);
+
+// Rutas de usuarios
+app.use("/api/user", userRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
