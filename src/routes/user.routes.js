@@ -4,6 +4,7 @@ import {
   getFavoritesByUsername,
   getFollowed,
   getFollowers,
+  getFollowing,
   getPublicUserByUsername,
   getWatchedByUsername,
   unfollowUser,
@@ -15,21 +16,24 @@ const router = express.Router();
 router.get("/:username", getPublicUserByUsername);
 
 // Get favorite movies by username
-router.get("/fav/:username", getFavoritesByUsername);
+router.get("/profile/fav/:username", getFavoritesByUsername);
 
 // Get watched movies by username
-router.get("/watched/:username", getWatchedByUsername);
+router.get("/profile/watched/:username", getWatchedByUsername);
 
-// Create a following relationship between users
-router.post("/follow", followUser);
+// Get following relationship between two users
+router.get("/profile/following", getFollowing);
 
-// Delte a following relationship between users
-router.delete("/unfollow", unfollowUser);
+// Create a following relationship between two users
+router.post("/profile/follow", followUser);
+
+// Delte a following relationship between two users
+router.delete("/profile/unfollow", unfollowUser);
 
 // Get users that an specific user follows
-router.get("/followed/:follower_id([0-9]+)", getFollowed);
+router.get("/profile/followed/:follower_id([0-9]+)", getFollowed);
 
 // Get users that follow an specific user
-router.get("/followers/:followed_id([0-9]+)", getFollowers);
+router.get("/profile/followers/:followed_id([0-9]+)", getFollowers);
 
 export default router;

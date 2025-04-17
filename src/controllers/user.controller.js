@@ -75,7 +75,7 @@ export const getWatchedByUsername = async (req, res) => {
 };
 
 export const getFollowing = async (req, res) => {
-  let { follower_id, followed_id } = req.body;
+  let { follower_id, followed_id } = req.query;
 
   try {
     if (!follower_id || !followed_id) {
