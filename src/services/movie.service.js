@@ -125,7 +125,7 @@ export const findReview = async (user_id, movie_id) => {
     SELECT reviews.*, users.username, users.avatar
     FROM reviews
     JOIN users ON reviews.user_id = users.id
-    WHERE reviews.user_id = $1 AND reviews.movie_id = $2"`,
+    WHERE reviews.user_id = $1 AND reviews.movie_id = $2`,
     [user_id, movie_id]
   );
   return rows[0];
