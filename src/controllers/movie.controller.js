@@ -5,6 +5,7 @@ import {
   addToFavorites,
   addToWatched,
   createMovie,
+  deleteReview,
   filterValidMovies,
   findFavorite,
   findFavorites,
@@ -16,7 +17,6 @@ import {
   findWatchedArray,
   removeFavorite,
   removeFromWatched,
-  removeReview,
 } from "../services/movie.service.js";
 
 dotenv.config();
@@ -322,7 +322,7 @@ export const addMovieReview = async (req, res) => {
   }
 };
 
-export const removeMovieReview = async (req, res) => {
+export const deleteMovieReview = async (req, res) => {
   const { user_id, movie_id } = req.body;
 
   try {
@@ -335,7 +335,7 @@ export const removeMovieReview = async (req, res) => {
     const movie_review = await findReview(user_id, movie_id);
 
     if (movie_review) {
-      await removeReview(user_id, movie_id);
+      await deleteReview(user_id, movie_id);
     } else {
       return res.status(400).json({
         message: "Selected movie was not reviewed",
@@ -347,7 +347,7 @@ export const removeMovieReview = async (req, res) => {
       data: movie_review,
     });
   } catch (error) {
-    console.error("Error in removeMovieReview:", error);
+    console.error("Error in deleteMovieReview:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  deleteUserById,
   followUser,
   getFavoritesByUsername,
   getFollowed,
@@ -14,6 +15,9 @@ const router = express.Router();
 
 // Get public user data by id
 router.get("/:username", getPublicUserByUsername);
+
+// Delete user account by id
+router.delete("/:user_id", deleteUserById);
 
 // Get favorite movies by username
 router.get("/profile/fav/:username", getFavoritesByUsername);

@@ -1,6 +1,7 @@
 import {
   createFollowing,
   deleteFollowing,
+  deleteUser,
   findFavsByUsername,
   findFollowed,
   findFollowers,
@@ -182,6 +183,25 @@ export const getFollowers = async (req, res) => {
     return res.json(followers);
   } catch (error) {
     console.error("Error in getFollowers:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteUserById = async (req, res) => {
+  let { user_id } = req.params;
+
+  try {
+    if (!user_id) {
+      return res.status(400).json({
+        message: "Bad request. User id is required",
+      });
+    }
+
+    const deletedUser = await deleteUser(user_id);
+
+    return res.json(deletedUser);
+  } catch (error) {
+    console.error("Error in deleteUserById:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

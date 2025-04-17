@@ -3,6 +3,7 @@ import {
   addMovieReview,
   addMovieToFavorites,
   addMovieToWatched,
+  deleteMovieReview,
   getApiMovieById,
   getGenres,
   getLanguages,
@@ -12,7 +13,6 @@ import {
   getMovieReviews,
   getMovieWatched,
   removeMovieFavorite,
-  removeMovieReview,
   removeMovieWatched,
   searchMoviesByTitle,
 } from "../controllers/movie.controller.js";
@@ -55,8 +55,8 @@ router.get("/languages", getLanguages);
 // Add movie review
 router.post("/review", addMovieReview);
 
-// Remove movie review
-router.delete("/review", removeMovieReview);
+// Delete movie review
+router.delete("/review", deleteMovieReview);
 
 // Get movie review
 router.get("/review", getMovieReview);

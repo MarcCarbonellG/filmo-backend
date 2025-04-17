@@ -139,7 +139,7 @@ export const addReview = async (user_id, movie_id, rating, content) => {
   return rows[0];
 };
 
-export const removeReview = async (user_id, movie_id) => {
+export const deleteReview = async (user_id, movie_id) => {
   const { rows } = await pool.query(
     "DELETE FROM reviews WHERE user_id = $1 AND movie_id = $2 RETURNING *",
     [user_id, movie_id]
