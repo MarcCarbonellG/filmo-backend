@@ -61,7 +61,7 @@ router.delete("/review", deleteMovieReview);
 // Get movie review
 router.get("/review", getMovieReview);
 
-// Get movie review
+// Get reviews of an specific movie
 router.get("/review/:movie_id([0-9]+)", getMovieReviews);
 
 export default router;

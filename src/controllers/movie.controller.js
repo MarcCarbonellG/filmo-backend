@@ -152,7 +152,7 @@ export const removeMovieFavorite = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    await removeFavorite(user_id, movie_id);
+    const movie_fav = await removeFavorite(user_id, movie_id);
 
     res.status(201).json({
       message: "Movie successfully removed from favorites",
@@ -201,13 +201,13 @@ export const addMovieToWatched = async (req, res) => {
       let movie = await findMovieById(movie_id);
 
       if (!movie) {
-        movie_data = await findMovieFromApiById(movie_id);
+        const movie_data = await findMovieFromApiById(movie_id);
         if (movie_data) {
           movie = await createMovie(
             movie_id,
             movie_data.title,
             movie_data.release_date,
-            movie_data.poster
+            movie_data.poster_path
           );
         } else {
           res.status(404).json({ message: "Movie not found" });
@@ -237,7 +237,7 @@ export const removeMovieWatched = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    await removeFromWatched(user_id, movie_id);
+    const movie_watched = await removeFromWatched(user_id, movie_id);
 
     res.status(201).json({
       message: "Movie successfully removed from watched",
@@ -296,13 +296,13 @@ export const addMovieReview = async (req, res) => {
       let movie = await findMovieById(movie_id);
 
       if (!movie) {
-        movie_data = await findMovieFromApiById(movie_id);
+        const movie_data = await findMovieFromApiById(movie_id);
         if (movie_data) {
           movie = await createMovie(
             movie_id,
             movie_data.title,
             movie_data.release_date,
-            movie_data.poster
+            movie_data.poster_path
           );
         } else {
           res.status(404).json({ message: "Movie not found" });
