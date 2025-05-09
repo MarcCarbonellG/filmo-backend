@@ -7,8 +7,8 @@ import {
   getApiMovieById,
   getGenres,
   getLanguages,
+  getMovieCollection,
   getMovieFavorites,
-  getMovieList,
   getMovieReview,
   getMovieReviews,
   getMovieWatched,
@@ -25,8 +25,8 @@ router.get("/search", searchMoviesByTitle);
 // Get a movie by id
 router.get("/:id([0-9]+)", getApiMovieById);
 
-// Get a list of movies (now playing, popular, top rated or upcoming)
-router.get("/list/:listName?", getMovieList);
+// Get a collection of movies (now playing, popular, top rated or upcoming)
+router.get("/collection/:collection?", getMovieCollection);
 
 // Get movie favorites
 router.get("/fav/:movie_id([0-9]+)", getMovieFavorites);

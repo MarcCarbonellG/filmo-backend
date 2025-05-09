@@ -65,6 +65,65 @@ export const findWatchedsByUsername = async (username) => {
   return rows;
 };
 
+export const findListsByUsername = async (username) => {
+  const { rows } = await pool.query(
+    `
+    WITH user_lookup AS (
+      SELECT id FROM users WHERE username = $1
+    )
+    SELECT
+    lists.*,
+    json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
+    $1 AS author
+    FROM lists
+    JOIN user_lookup ON lists.user_id = user_lookup.id
+    LEFT JOIN movie_list ON movie_list.list_id = lists.id
+    LEFT JOIN movies ON movies.id = movie_list.movie_id
+    WHERE lists.user_id = user_lookup.id
+    GROUP BY lists.id;
+    `,
+    [username]
+  );
+  return rows;
+};
+
+export const findProfileLists = async (username) => {
+  const { rows } = await pool.query(
+    `
+    WITH user_lookup AS (
+      SELECT id FROM users WHERE username = $1
+    )
+    SELECT
+      lists.*,
+      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
+      $1 AS author
+    FROM lists
+    JOIN user_lookup ON lists.user_id = user_lookup.id
+    LEFT JOIN movie_list ON movie_list.list_id = lists.id
+    LEFT JOIN movies ON movies.id = movie_list.movie_id
+    WHERE lists.user_id = user_lookup.id
+    GROUP BY lists.id
+
+    UNION ALL
+
+    SELECT 
+      lists.*, 
+      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
+      users.username AS author
+    FROM list_saved
+    JOIN lists ON lists.id = list_saved.list_id
+    JOIN user_lookup ON list_saved.user_id = user_lookup.id
+    LEFT JOIN movie_list ON movie_list.list_id = lists.id
+    LEFT JOIN movies ON movies.id = movie_list.movie_id
+    LEFT JOIN users ON lists.user_id = users.id
+    GROUP BY lists.id, users.username;
+
+    `,
+    [username]
+  );
+  return rows;
+};
+
 export const findFollowing = async (followerId, followedId) => {
   const { rows } = await pool.query(
     "SELECT * FROM following WHERE follower_id = $1 AND followed_id = $2",

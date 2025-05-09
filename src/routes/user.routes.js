@@ -6,6 +6,8 @@ import {
   getFollowed,
   getFollowers,
   getFollowing,
+  getListsByUsername,
+  getProfileLists,
   getPublicUserByUsername,
   getWatchedByUsername,
   unfollowUser,
@@ -13,7 +15,7 @@ import {
 
 const router = express.Router();
 
-// Get public user data by id
+// Get public user data by username
 router.get("/:username", getPublicUserByUsername);
 
 // Delete user account by id
@@ -24,6 +26,12 @@ router.get("/profile/fav/:username", getFavoritesByUsername);
 
 // Get watched movies by username
 router.get("/profile/watched/:username", getWatchedByUsername);
+
+// Get own lists by username
+router.get("/profile/lists/:username", getListsByUsername);
+
+// Get own and saved lists by username
+router.get("/profile/lists/all/:username", getProfileLists);
 
 // Get following relationship between two users
 router.get("/profile/following", getFollowing);

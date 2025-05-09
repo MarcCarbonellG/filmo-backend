@@ -6,6 +6,8 @@ import {
   findFollowed,
   findFollowers,
   findFollowing,
+  findListsByUsername,
+  findProfileLists,
   findUserByUsername,
   findWatchedsByUsername,
 } from "../services/user.service.js";
@@ -71,6 +73,44 @@ export const getWatchedByUsername = async (req, res) => {
     res.json(watched);
   } catch (error) {
     console.error("Error in getWatchedByUsername:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getListsByUsername = async (req, res) => {
+  let { username } = req.params;
+
+  try {
+    if (!username) {
+      return res
+        .status(400)
+        .json({ message: "Bad request. Username is required" });
+    }
+
+    const lists = await findListsByUsername(username);
+
+    res.json(lists);
+  } catch (error) {
+    console.error("Error in getListsByUsername:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getProfileLists = async (req, res) => {
+  let { username } = req.params;
+
+  try {
+    if (!username) {
+      return res
+        .status(400)
+        .json({ message: "Bad request. Username is required" });
+    }
+
+    const lists = await findProfileLists(username);
+
+    res.json(lists);
+  } catch (error) {
+    console.error("Error in getProfileLists:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

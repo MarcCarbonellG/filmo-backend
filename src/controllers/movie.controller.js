@@ -57,24 +57,24 @@ export const getApiMovieById = async (req, res) => {
   }
 };
 
-export const getMovieList = async (req, res) => {
-  let { listName } = req.params;
+export const getMovieCollection = async (req, res) => {
+  let { collection } = req.params;
 
   if (
-    !listName ||
-    !["now_playing", "popular", "top_rated", "upcoming"].includes(listName)
+    !collection ||
+    !["now_playing", "popular", "top_rated", "upcoming"].includes(collection)
   ) {
-    listName = "now_playing";
+    collection = "now_playing";
   }
 
   try {
-    const response = await axios.get(`${TMDB_BASE_URL}/movie/${listName}`, {
+    const response = await axios.get(`${TMDB_BASE_URL}/movie/${collection}`, {
       params: { api_key: TMDB_API_KEY, language: "es-ES" },
     });
 
     res.json(response.data);
   } catch (error) {
-    console.error("Error in getMovieList:", error);
+    console.error("Error in getMovieCollection:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
