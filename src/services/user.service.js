@@ -165,3 +165,21 @@ export const deleteFollowing = async (followerId, followedId) => {
 
   return rows[0];
 };
+
+export const findFriends = async (userId) => {
+  const { rows } = await pool.query(
+    `
+    SELECT u.id, u.username, u.avatar, u.is_admin
+    FROM following f1
+    JOIN following f2 
+      ON f1.follower_id = f2.followed_id 
+    AND f1.followed_id = f2.follower_id
+    JOIN users u 
+      ON u.id = f1.followed_id
+    WHERE f1.follower_id = $1;
+
+    `,
+    [userId]
+  );
+  return rows;
+};

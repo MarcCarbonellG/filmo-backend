@@ -6,6 +6,7 @@ import {
   findFollowed,
   findFollowers,
   findFollowing,
+  findFriends,
   findListsByUsername,
   findProfileLists,
   findUserByUsername,
@@ -242,6 +243,25 @@ export const deleteUserById = async (req, res) => {
     return res.json(deletedUser);
   } catch (error) {
     console.error("Error in deleteUserById:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getFriends = async (req, res) => {
+  let { userId } = req.params;
+
+  try {
+    if (!userId) {
+      return res.status(400).json({
+        message: "Bad request. User id is required",
+      });
+    }
+
+    const friends = await findFriends(userId);
+
+    return res.json(friends);
+  } catch (error) {
+    console.error("Error in getFriends:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

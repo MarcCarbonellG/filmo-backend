@@ -6,6 +6,7 @@ import {
   getFollowed,
   getFollowers,
   getFollowing,
+  getFriends,
   getListsByUsername,
   getProfileLists,
   getPublicUserByUsername,
@@ -47,5 +48,8 @@ router.get("/profile/followed/:follower_id([0-9]+)", getFollowed);
 
 // Get users that follow an specific user
 router.get("/profile/followers/:followed_id([0-9]+)", getFollowers);
+
+// Get users that follow an specific user
+router.get("/profile/friends/:userId", getFriends);
 
 export default router;
