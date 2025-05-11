@@ -10,6 +10,7 @@ import {
   getListsByUsername,
   getProfileLists,
   getPublicUserByUsername,
+  getUserReviews,
   getWatchedByUsername,
   unfollowUser,
 } from "../controllers/user.controller.js";
@@ -51,5 +52,8 @@ router.get("/profile/followers/:followed_id([0-9]+)", getFollowers);
 
 // Get users that follow an specific user
 router.get("/profile/friends/:userId", getFriends);
+
+// Get user reviews
+router.get("/reviews/:userId", getUserReviews);
 
 export default router;

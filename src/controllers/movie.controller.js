@@ -393,3 +393,18 @@ export const getMovieReviews = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getMovieGenres = async (req, res) => {
+  const { movieId } = req.params;
+
+  try {
+    const response = await axios.get(`${TMDB_BASE_URL}/movie/${movieId}`, {
+      params: { api_key: TMDB_API_KEY, language: "es-ES" },
+    });
+
+    res.json({ id: movieId, genres: response.data.genres });
+  } catch (error) {
+    console.error("Error in getMovieGenres:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

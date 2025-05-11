@@ -9,6 +9,7 @@ import {
   getLanguages,
   getMovieCollection,
   getMovieFavorites,
+  getMovieGenres,
   getMovieReview,
   getMovieReviews,
   getMovieWatched,
@@ -48,6 +49,9 @@ router.delete("/watched", removeMovieWatched);
 
 // Get genres
 router.get("/genres", getGenres);
+
+// Get movie genres
+router.get("/genres/:movieId", getMovieGenres);
 
 // Get languages
 router.get("/languages", getLanguages);

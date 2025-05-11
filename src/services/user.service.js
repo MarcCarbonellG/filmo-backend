@@ -183,3 +183,15 @@ export const findFriends = async (userId) => {
   );
   return rows;
 };
+
+export const findUserReviews = async (userId) => {
+  const { rows } = await pool.query(
+    `
+    SELECT *
+    FROM reviews
+    WHERE user_id = $1
+    `,
+    [userId]
+  );
+  return rows;
+};
