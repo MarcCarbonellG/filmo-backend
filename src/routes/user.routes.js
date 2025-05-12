@@ -10,6 +10,7 @@ import {
   getListsByUsername,
   getProfileLists,
   getPublicUserByUsername,
+  getUserRecommendations,
   getUserReviews,
   getWatchedByUsername,
   unfollowUser,
@@ -55,5 +56,8 @@ router.get("/profile/friends/:userId", getFriends);
 
 // Get user reviews
 router.get("/reviews/:userId", getUserReviews);
+
+// Get user recommendations
+router.get("/recommendations/:userId", getUserRecommendations);
 
 export default router;

@@ -10,6 +10,7 @@ import {
   findListsByUsername,
   findProfileLists,
   findUserByUsername,
+  findUserRecommendations,
   findUserReviews,
   findWatchedsByUsername,
 } from "../services/user.service.js";
@@ -282,6 +283,25 @@ export const getUserReviews = async (req, res) => {
     return res.json(reviews);
   } catch (error) {
     console.error("Error in getUserReviews:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getUserRecommendations = async (req, res) => {
+  let { userId } = req.params;
+
+  try {
+    if (!userId) {
+      return res.status(400).json({
+        message: "Bad request. User id is required",
+      });
+    }
+
+    const recommendations = await findUserRecommendations(userId);
+
+    return res.json(recommendations);
+  } catch (error) {
+    console.error("Error in getUserRecommendations:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

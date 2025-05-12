@@ -157,3 +157,23 @@ export const findReviews = async (movie_id) => {
   );
   return rows;
 };
+
+export const createRecommendation = async (
+  recommenderId,
+  recommendedId,
+  movieId
+) => {
+  const { rows } = await pool.query(
+    "INSERT INTO recommendations (recommender_id, recommended_id, movie_id) VALUES ($1, $2, $3)",
+    [recommenderId, recommendedId, movieId]
+  );
+  return rows[0];
+};
+
+export const deleteRecommendation = async (recommendationId) => {
+  const { rows } = await pool.query(
+    "DELETE FROM recommendations WHERE id = $1 RETURNING *",
+    [recommendationId]
+  );
+  return rows[0];
+};

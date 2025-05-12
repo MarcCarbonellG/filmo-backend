@@ -5,6 +5,8 @@ import {
   addToFavorites,
   addToWatched,
   createMovie,
+  createRecommendation,
+  deleteRecommendation,
   deleteReview,
   filterValidMovies,
   findFavorite,
@@ -332,15 +334,7 @@ export const deleteMovieReview = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    const movie_review = await findReview(user_id, movie_id);
-
-    if (movie_review) {
-      await deleteReview(user_id, movie_id);
-    } else {
-      return res.status(400).json({
-        message: "Selected movie was not reviewed",
-      });
-    }
+    await deleteReview(user_id, movie_id);
 
     res.status(201).json({
       message: "Movie review successfully removed",
@@ -405,6 +399,71 @@ export const getMovieGenres = async (req, res) => {
     res.json({ id: movieId, genres: response.data.genres });
   } catch (error) {
     console.error("Error in getMovieGenres:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const createMovieRecommendation = async (req, res) => {
+  const { recommenderId, recommendedId, movieId } = req.body;
+
+  try {
+    if (!recommenderId || !recommendedId || !movieId) {
+      return res.status(400).json({
+        message:
+          "Bad request. Recommender, recommended and movie ids are required",
+      });
+    }
+
+    let movie = await findMovieById(movieId);
+
+    if (!movie) {
+      const movie_data = await findMovieFromApiById(movieId);
+      if (movie_data) {
+        movie = await createMovie(
+          movieId,
+          movie_data.title,
+          movie_data.release_date,
+          movie_data.poster_path
+        );
+      } else {
+        res.status(404).json({ message: "Movie not found" });
+      }
+    }
+
+    const recommendation = await createRecommendation(
+      recommenderId,
+      recommendedId,
+      movieId
+    );
+
+    res.status(201).json({
+      message: "Recommendation successfully created",
+      data: { recommendation, movie },
+    });
+  } catch (error) {
+    console.error("Error in createMovieRecommendation:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteMovieRecommendation = async (req, res) => {
+  const { recommendationId } = req.body;
+
+  try {
+    if (!recommendationId) {
+      return res
+        .status(400)
+        .json({ message: "Bad request. Recommendation id is required" });
+    }
+
+    const recommendation = await deleteRecommendation(recommendationId);
+
+    res.status(201).json({
+      message: "Movie recommendation successfully removed",
+      data: recommendation,
+    });
+  } catch (error) {
+    console.error("Error in deleteMovieRecommendation:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

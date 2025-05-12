@@ -3,6 +3,8 @@ import {
   addMovieReview,
   addMovieToFavorites,
   addMovieToWatched,
+  createMovieRecommendation,
+  deleteMovieRecommendation,
   deleteMovieReview,
   getApiMovieById,
   getGenres,
@@ -67,5 +69,11 @@ router.get("/review", getMovieReview);
 
 // Get reviews of an specific movie
 router.get("/review/:movie_id([0-9]+)", getMovieReviews);
+
+// Create movie recommendation
+router.post("/recommendation", createMovieRecommendation);
+
+// Delete movie recommendation
+router.delete("/recommendation", deleteMovieRecommendation);
 
 export default router;

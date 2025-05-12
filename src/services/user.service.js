@@ -195,3 +195,21 @@ export const findUserReviews = async (userId) => {
   );
   return rows;
 };
+
+export const findUserRecommendations = async (userId) => {
+  const { rows } = await pool.query(
+    `
+    SELECT 
+      r.*,
+      u.username AS recommender_username,
+      u.avatar AS recommender_avatar,
+      m.title AS movie_title
+    FROM recommendations r
+    JOIN users u ON r.recommender_id = u.id
+    JOIN movies m ON r.movie_id = m.id
+    WHERE r.recommended_id = $1;
+    `,
+    [userId]
+  );
+  return rows;
+};
