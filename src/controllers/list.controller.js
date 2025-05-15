@@ -273,3 +273,24 @@ export const removeListSaved = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getListCollection = async (req, res) => {
+  let { collection } = req.params;
+
+  if (!collection || !["popular", "following"].includes(collection)) {
+    collection = "popular";
+  }
+
+  try {
+    let lists;
+
+    if ((collection = "popular")) {
+    } else {
+    }
+
+    res.json(lists);
+  } catch (error) {
+    console.error("Error in getListCollection:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

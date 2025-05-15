@@ -13,8 +13,11 @@ import {
   findFavorites,
   findMovieById,
   findMovieFromApiById,
+  findPopularAmongFollowed,
+  findPopularMovies,
   findReview,
   findReviews,
+  findTopRatedMovies,
   findWatched,
   findWatchedArray,
   removeFavorite,
@@ -64,19 +67,48 @@ export const getMovieCollection = async (req, res) => {
 
   if (
     !collection ||
-    !["now_playing", "popular", "top_rated", "upcoming"].includes(collection)
+    !["now_playing", "popular", "top_rated", "upcoming", "following"].includes(
+      collection
+    )
   ) {
     collection = "now_playing";
   }
 
   try {
-    const response = await axios.get(`${TMDB_BASE_URL}/movie/${collection}`, {
-      params: { api_key: TMDB_API_KEY, language: "es-ES" },
-    });
+    let movies;
 
-    res.json(response.data);
+    switch (collection) {
+      case "top_rated":
+        movies = await findTopRatedMovies();
+        break;
+      case "popular":
+        movies = await findPopularMovies();
+        break;
+      default:
+        const response = await axios.get(
+          `${TMDB_BASE_URL}/movie/${collection}`,
+          {
+            params: { api_key: TMDB_API_KEY, language: "es-ES" },
+          }
+        );
+        movies = response.data.results;
+    }
+    res.json(movies);
   } catch (error) {
     console.error("Error in getMovieCollection:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getPopularAmongFollowed = async (req, res) => {
+  let { userId } = req.params;
+
+  try {
+    let movies;
+    movies = await findPopularAmongFollowed(userId);
+    res.json(movies);
+  } catch (error) {
+    console.error("Error in getPopularAmongFollowed:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

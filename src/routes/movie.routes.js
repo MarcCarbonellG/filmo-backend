@@ -15,6 +15,7 @@ import {
   getMovieReview,
   getMovieReviews,
   getMovieWatched,
+  getPopularAmongFollowed,
   removeMovieFavorite,
   removeMovieWatched,
   searchMoviesByTitle,
@@ -28,11 +29,14 @@ router.get("/search", searchMoviesByTitle);
 // Get a movie by id
 router.get("/:id([0-9]+)", getApiMovieById);
 
-// Get a collection of movies (now playing, popular, top rated or upcoming)
+// Get a collection of movies (now playing, popular, top rated, upcoming or following)
 router.get("/collection/:collection?", getMovieCollection);
 
+// Get most popular movies among the ones followed by user
+router.get("/following/:userId", getPopularAmongFollowed);
+
 // Get movie favorites
-router.get("/fav/:movie_id([0-9]+)", getMovieFavorites);
+router.get("/fav/:movie_id", getMovieFavorites);
 
 // Add movie to favorites
 router.post("/fav", addMovieToFavorites);
@@ -41,7 +45,7 @@ router.post("/fav", addMovieToFavorites);
 router.delete("/fav", removeMovieFavorite);
 
 // Get movie watched array
-router.get("/watched/:movie_id([0-9]+)", getMovieWatched);
+router.get("/watched/:movie_id", getMovieWatched);
 
 // Add movie to watched
 router.post("/watched", addMovieToWatched);
@@ -68,7 +72,7 @@ router.delete("/review", deleteMovieReview);
 router.get("/review", getMovieReview);
 
 // Get reviews of an specific movie
-router.get("/review/:movie_id([0-9]+)", getMovieReviews);
+router.get("/review/:movie_id", getMovieReviews);
 
 // Create movie recommendation
 router.post("/recommendation", createMovieRecommendation);

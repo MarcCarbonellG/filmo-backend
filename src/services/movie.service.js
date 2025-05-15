@@ -55,6 +55,52 @@ export const createMovie = async (id, title, release_date, poster) => {
   return rows[0];
 };
 
+export const findTopRatedMovies = async () => {
+  const { rows } = await pool.query(
+    `
+    SELECT m.*, AVG(r.rating) AS promedio_rating, COUNT(r.rating) AS total_reviews
+    FROM movies m
+    JOIN reviews r ON m.id = r.movie_id
+    GROUP BY m.id
+    HAVING COUNT(r.rating) >= 1
+    ORDER BY promedio_rating DESC
+    LIMIT 30;
+    `
+  );
+  return rows;
+};
+
+export const findPopularMovies = async () => {
+  const { rows } = await pool.query(
+    `
+    SELECT m.*, COUNT(f.user_id) AS total_favs
+    FROM movies m
+    JOIN movie_fav f ON m.id = f.movie_id
+    GROUP BY m.id
+    ORDER BY total_favs DESC
+    LIMIT 30;
+    `
+  );
+  return rows;
+};
+
+export const findPopularAmongFollowed = async (userId) => {
+  const { rows } = await pool.query(
+    `
+    SELECT m.*, COUNT(f.user_id) AS total_favs
+    FROM movies m
+    JOIN movie_fav f ON m.id = f.movie_id
+    JOIN following fo ON f.user_id = fo.followed_id
+    WHERE fo.follower_id = $1
+    GROUP BY m.id
+    ORDER BY total_favs DESC
+    LIMIT 30;
+    `,
+    [userId]
+  );
+  return rows;
+};
+
 export const findFavorites = async (movie_id) => {
   const { rows } = await pool.query(
     "SELECT * FROM movie_fav WHERE movie_id = $1",
