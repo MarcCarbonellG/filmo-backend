@@ -3,8 +3,10 @@ import {
   addToSaved,
   createList,
   deleteList,
+  findFollowedLists,
   findListById,
   findMovieListRelation,
+  findPopularLists,
   findSaved,
   findUserListsWithMovieStatus,
   removeFromList,
@@ -274,23 +276,32 @@ export const removeListSaved = async (req, res) => {
   }
 };
 
-export const getListCollection = async (req, res) => {
-  let { collection } = req.params;
-
-  if (!collection || !["popular", "following"].includes(collection)) {
-    collection = "popular";
-  }
-
+export const getPopularLists = async (req, res) => {
   try {
-    let lists;
-
-    if ((collection = "popular")) {
-    } else {
-    }
+    const lists = await findPopularLists();
 
     res.json(lists);
   } catch (error) {
-    console.error("Error in getListCollection:", error);
+    console.error("Error in getPopularLists:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getFollowedLists = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ message: "Bad request. User id is required" });
+    }
+
+    const lists = await findFollowedLists(userId);
+
+    res.status(201).json(lists);
+  } catch (error) {
+    console.error("Error in getFollowedLists:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

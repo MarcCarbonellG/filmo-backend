@@ -4,9 +4,10 @@ import {
   addMovieToList,
   createMovieList,
   deleteListById,
+  getFollowedLists,
   getListById,
-  getListCollection,
   getListSaved,
+  getPopularLists,
   getUserListsWithMovieStatus,
   removeListSaved,
   removeMovieFromList,
@@ -21,8 +22,11 @@ router.post("/", createMovieList);
 // Get user lists
 router.get("/", getUserListsWithMovieStatus);
 
-// Get a collection of lists (popular or following)
-router.get("/collection/:collection?", getListCollection);
+// Get a collection of popular lists
+router.get("/popular", getPopularLists);
+
+// Get lists created by followed users
+router.get("/followed/:userId", getFollowedLists);
 
 // Adds movie to a list
 router.post("/movie", addMovieToList);

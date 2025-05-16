@@ -49,7 +49,7 @@ export const findMovieFromApiById = async (id) => {
 
 export const createMovie = async (id, title, release_date, poster) => {
   const { rows } = await pool.query(
-    "INSERT INTO movies (id, title, release_date, poster) VALUES ($1, $2, $3, $4)",
+    "INSERT INTO movies (id, title, release_date, poster_path) VALUES ($1, $2, $3, $4)",
     [id, title, release_date, poster]
   );
   return rows[0];

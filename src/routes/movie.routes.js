@@ -29,7 +29,7 @@ router.get("/search", searchMoviesByTitle);
 // Get a movie by id
 router.get("/:id([0-9]+)", getApiMovieById);
 
-// Get a collection of movies (now playing, popular, top rated, upcoming or following)
+// Get a collection of movies (now playing, popular, top rated, or upcoming)
 router.get("/collection/:collection?", getMovieCollection);
 
 // Get most popular movies among the ones followed by user

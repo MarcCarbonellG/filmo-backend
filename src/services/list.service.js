@@ -137,3 +137,54 @@ export const removeFromSaved = async (userId, listId) => {
   );
   return rows[0];
 };
+
+export const findPopularLists = async () => {
+  const { rows } = await pool.query(
+    `
+    SELECT
+      lists.*,
+      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
+      users.username AS author,
+      (
+        SELECT COUNT(*)
+        FROM list_saved
+        WHERE list_saved.list_id = lists.id
+      ) AS saved
+    FROM lists
+    LEFT JOIN movie_list ON movie_list.list_id = lists.id
+    LEFT JOIN movies ON movies.id = movie_list.movie_id
+    LEFT JOIN users ON lists.user_id = users.id
+    GROUP BY lists.id, users.username
+    ORDER BY saved DESC
+    LIMIT 10;
+    `
+  );
+  return rows;
+};
+
+export const findFollowedLists = async (userId) => {
+  const { rows } = await pool.query(
+    `
+    SELECT
+      lists.*,
+      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
+      users.username AS author,
+      (
+        SELECT COUNT(*)
+        FROM list_saved
+        WHERE list_saved.list_id = lists.id
+      ) AS saved
+    FROM following
+    JOIN lists ON lists.user_id = following.followed_id
+    LEFT JOIN movie_list ON movie_list.list_id = lists.id
+    LEFT JOIN movies ON movies.id = movie_list.movie_id
+    LEFT JOIN users ON lists.user_id = users.id
+    WHERE following.follower_id = $1
+    GROUP BY lists.id, users.username
+    ORDER BY saved DESC
+    LIMIT 10;
+    `,
+    [userId]
+  );
+  return rows;
+};
