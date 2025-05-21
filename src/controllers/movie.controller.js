@@ -8,7 +8,6 @@ import {
   createRecommendation,
   deleteRecommendation,
   deleteReview,
-  filterValidMovies,
   findFavorite,
   findFavorites,
   findMovieById,
@@ -30,17 +29,28 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
 export const searchMoviesByTitle = async (req, res) => {
-  const { query } = req.query;
+  const { query, page } = req.query;
+
   if (!query) {
     return res.status(400).json({ message: "Query parameter is required" });
   }
 
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
-      params: { api_key: TMDB_API_KEY, query, language: "es-ES" },
+      params: {
+        api_key: TMDB_API_KEY,
+        query,
+        language: "es-ES",
+        page: page === "undefined" ? 1 : Number(page),
+      },
     });
 
-    res.json(filterValidMovies(response.data.results));
+    res.json({
+      page: response.data.page,
+      movies: response.data.results,
+      total_pages: response.data.total_pages,
+      total_results: response.data.total_results,
+    });
   } catch (error) {
     console.error("Error in searchMoviesByTitle:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -366,7 +376,7 @@ export const deleteMovieReview = async (req, res) => {
         .json({ message: "Bad request, user_id and movie_id are required" });
     }
 
-    await deleteReview(user_id, movie_id);
+    const movie_review = await deleteReview(user_id, movie_id);
 
     res.status(201).json({
       message: "Movie review successfully removed",
