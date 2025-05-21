@@ -44,6 +44,7 @@ export const getPublicUserByUsername = async (req, res) => {
 
 export const getFavoritesByUsername = async (req, res) => {
   let { username } = req.params;
+  let { page } = req.query;
 
   try {
     if (!username) {
@@ -54,7 +55,14 @@ export const getFavoritesByUsername = async (req, res) => {
 
     const favorites = await findFavsByUsername(username);
 
-    res.json(favorites);
+    page ??= 1;
+
+    res.json({
+      page: page ?? 1,
+      movies: favorites.slice((page - 1) * 20, (page - 1) * 20 + 20),
+      total_pages: Math.ceil(favorites.length / 20),
+      total_results: favorites.length,
+    });
   } catch (error) {
     console.error("Error in getFavoritesByUsername:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -63,6 +71,7 @@ export const getFavoritesByUsername = async (req, res) => {
 
 export const getWatchedByUsername = async (req, res) => {
   let { username } = req.params;
+  let { page } = req.query;
 
   try {
     if (!username) {
@@ -73,7 +82,14 @@ export const getWatchedByUsername = async (req, res) => {
 
     const watched = await findWatchedsByUsername(username);
 
-    res.json(watched);
+    page ??= 1;
+
+    res.json({
+      page: page ?? 1,
+      movies: watched.slice((page - 1) * 20, (page - 1) * 20 + 20),
+      total_pages: Math.ceil(watched.length / 20),
+      total_results: watched.length,
+    });
   } catch (error) {
     console.error("Error in getWatchedByUsername:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -82,6 +98,7 @@ export const getWatchedByUsername = async (req, res) => {
 
 export const getListsByUsername = async (req, res) => {
   let { username } = req.params;
+  let { page } = req.query;
 
   try {
     if (!username) {
@@ -92,7 +109,14 @@ export const getListsByUsername = async (req, res) => {
 
     const lists = await findListsByUsername(username);
 
-    res.json(lists);
+    page ??= 1;
+
+    res.json({
+      page: page ?? 1,
+      lists: lists.slice((page - 1) * 5, (page - 1) * 5 + 5),
+      total_pages: Math.ceil(lists.length / 5),
+      total_results: lists.length,
+    });
   } catch (error) {
     console.error("Error in getListsByUsername:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -101,6 +125,7 @@ export const getListsByUsername = async (req, res) => {
 
 export const getProfileLists = async (req, res) => {
   let { username } = req.params;
+  let { page } = req.query;
 
   try {
     if (!username) {
@@ -111,7 +136,14 @@ export const getProfileLists = async (req, res) => {
 
     const lists = await findProfileLists(username);
 
-    res.json(lists);
+    page ??= 1;
+
+    res.json({
+      page: page ?? 1,
+      lists: lists.slice((page - 1) * 5, (page - 1) * 5 + 5),
+      total_pages: Math.ceil(lists.length / 5),
+      total_results: lists.length,
+    });
   } catch (error) {
     console.error("Error in getProfileLists:", error);
     res.status(500).json({ message: "Internal server error" });
