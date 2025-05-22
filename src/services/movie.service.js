@@ -61,7 +61,7 @@ export const findTopRatedMovies = async () => {
     SELECT m.*, AVG(r.rating) AS promedio_rating, COUNT(r.rating) AS total_reviews
     FROM movies m
     JOIN reviews r ON m.id = r.movie_id
-    GROUP BY m.id
+    GROUP BY m.id, m.title
     HAVING COUNT(r.rating) >= 1
     ORDER BY promedio_rating DESC
     LIMIT 30;
@@ -76,7 +76,7 @@ export const findPopularMovies = async () => {
     SELECT m.*, COUNT(f.user_id) AS total_favs
     FROM movies m
     JOIN movie_fav f ON m.id = f.movie_id
-    GROUP BY m.id
+    GROUP BY m.id, m.title
     ORDER BY total_favs DESC
     LIMIT 30;
     `
@@ -92,7 +92,7 @@ export const findPopularAmongFollowed = async (userId) => {
     JOIN movie_fav f ON m.id = f.movie_id
     JOIN following fo ON f.user_id = fo.followed_id
     WHERE fo.follower_id = $1
-    GROUP BY m.id
+    GROUP BY m.id, m.title
     ORDER BY total_favs DESC
     LIMIT 30;
     `,

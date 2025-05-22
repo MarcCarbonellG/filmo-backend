@@ -154,7 +154,7 @@ export const findPopularLists = async () => {
     LEFT JOIN movie_list ON movie_list.list_id = lists.id
     LEFT JOIN movies ON movies.id = movie_list.movie_id
     LEFT JOIN users ON lists.user_id = users.id
-    GROUP BY lists.id, users.username
+    GROUP BY lists.id, users.username, lists.user_id
     ORDER BY saved DESC
     LIMIT 10;
     `
@@ -180,7 +180,7 @@ export const findFollowedLists = async (userId) => {
     LEFT JOIN movies ON movies.id = movie_list.movie_id
     LEFT JOIN users ON lists.user_id = users.id
     WHERE following.follower_id = $1
-    GROUP BY lists.id, users.username
+    GROUP BY lists.id, users.username, lists.user_id
     ORDER BY saved DESC
     LIMIT 10;
     `,
