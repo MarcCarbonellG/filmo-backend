@@ -59,6 +59,7 @@ export const createMovieList = async (req, res) => {
 
 export const getListById = async (req, res) => {
   const { listId } = req.params;
+  let { page } = req.query;
 
   try {
     if (!listId) {
@@ -69,7 +70,15 @@ export const getListById = async (req, res) => {
 
     const list = await findListById(listId);
 
-    return res.json(list);
+    page ??= 1;
+
+    return res.json({
+      ...list,
+      page: page ?? 1,
+      movies: list.movies.slice((page - 1) * 20, (page - 1) * 20 + 20),
+      total_pages: Math.ceil(list.movies.length / 20),
+      total_results: list.movies.length,
+    });
   } catch (error) {
     console.error("Error in getListById:", error);
     res.status(500).json({ message: "Internal server error" });

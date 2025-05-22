@@ -84,7 +84,7 @@ export const getWatchedByUsername = async (req, res) => {
 
     page ??= 1;
 
-    res.json({
+    return res.json({
       page: page ?? 1,
       movies: watched.slice((page - 1) * 20, (page - 1) * 20 + 20),
       total_pages: Math.ceil(watched.length / 20),
@@ -111,7 +111,7 @@ export const getListsByUsername = async (req, res) => {
 
     page ??= 1;
 
-    res.json({
+    return res.json({
       page: page ?? 1,
       lists: lists.slice((page - 1) * 5, (page - 1) * 5 + 5),
       total_pages: Math.ceil(lists.length / 5),
@@ -138,7 +138,7 @@ export const getProfileLists = async (req, res) => {
 
     page ??= 1;
 
-    res.json({
+    return res.json({
       page: page ?? 1,
       lists: lists.slice((page - 1) * 5, (page - 1) * 5 + 5),
       total_pages: Math.ceil(lists.length / 5),
