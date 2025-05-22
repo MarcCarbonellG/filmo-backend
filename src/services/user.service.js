@@ -134,7 +134,12 @@ export const findFollowing = async (followerId, followedId) => {
 
 export const findFollowed = async (followerId) => {
   const { rows } = await pool.query(
-    "SELECT * FROM following WHERE follower_id = $1",
+    `
+    SELECT users.id, users.username, users.avatar, users.is_admin
+    FROM following
+    JOIN users ON following.followed_id = users.id
+    WHERE following.follower_id = $1;
+    `,
     [followerId]
   );
   return rows;
@@ -142,7 +147,12 @@ export const findFollowed = async (followerId) => {
 
 export const findFollowers = async (followedId) => {
   const { rows } = await pool.query(
-    "SELECT * FROM following WHERE followed_id = $1",
+    `
+    SELECT users.id, users.username, users.avatar, users.is_admin
+    FROM following
+    JOIN users ON following.follower_id = users.id
+    WHERE following.followed_id = $1;
+    `,
     [followedId]
   );
   return rows;
