@@ -70,17 +70,23 @@ export const findListsByUsername = async (username) => {
     `
     WITH user_lookup AS (
       SELECT id FROM users WHERE username = $1
+    ),
+    movie_agg AS (
+      SELECT 
+        movie_list.list_id,
+        json_agg(m) FILTER (WHERE m.id IS NOT NULL) AS movies
+      FROM movie_list
+      LEFT JOIN movies m ON m.id = movie_list.movie_id
+      GROUP BY movie_list.list_id
     )
-    SELECT
-    lists.*,
-    json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
-    $1 AS author
-    FROM lists
-    JOIN user_lookup ON lists.user_id = user_lookup.id
-    LEFT JOIN movie_list ON movie_list.list_id = lists.id
-    LEFT JOIN movies ON movies.id = movie_list.movie_id
-    WHERE lists.user_id = user_lookup.id
-    GROUP BY lists.id;
+    SELECT 
+      l.*,
+      ma.movies,
+      $1 AS author
+    FROM lists l
+    JOIN user_lookup u ON l.user_id = u.id
+    LEFT JOIN movie_agg ma ON ma.list_id = l.id
+    WHERE l.user_id = u.id;
     `,
     [username]
   );
@@ -92,32 +98,32 @@ export const findProfileLists = async (username) => {
     `
     WITH user_lookup AS (
       SELECT id FROM users WHERE username = $1
+    ),
+    movie_agg AS (
+      SELECT 
+        movie_list.list_id,
+        json_agg(m) FILTER (WHERE m.id IS NOT NULL) AS movies
+      FROM movie_list
+      LEFT JOIN movies m ON m.id = movie_list.movie_id
+      GROUP BY movie_list.list_id
     )
-    SELECT
-      lists.*,
-      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
-      $1 AS author
-    FROM lists
-    JOIN user_lookup ON lists.user_id = user_lookup.id
-    LEFT JOIN movie_list ON movie_list.list_id = lists.id
-    LEFT JOIN movies ON movies.id = movie_list.movie_id
-    WHERE lists.user_id = user_lookup.id
-    GROUP BY lists.id
-
-    UNION ALL
-
     SELECT 
-      lists.*, 
-      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
-      users.username AS author
-    FROM list_saved
-    JOIN lists ON lists.id = list_saved.list_id
-    JOIN user_lookup ON list_saved.user_id = user_lookup.id
-    LEFT JOIN movie_list ON movie_list.list_id = lists.id
-    LEFT JOIN movies ON movies.id = movie_list.movie_id
-    LEFT JOIN users ON lists.user_id = users.id
-    GROUP BY lists.id, users.username;
-
+      l.*, 
+      ma.movies, 
+      $1 AS author
+    FROM lists l
+    JOIN user_lookup u ON l.user_id = u.id
+    LEFT JOIN movie_agg ma ON ma.list_id = l.id
+    UNION ALL
+    SELECT 
+      l.*, 
+      ma.movies, 
+      u2.username AS author
+    FROM list_saved ls
+    JOIN lists l ON l.id = ls.list_id
+    JOIN user_lookup u ON ls.user_id = u.id
+    LEFT JOIN movie_agg ma ON ma.list_id = l.id
+    LEFT JOIN users u2 ON l.user_id = u2.id;
     `,
     [username]
   );

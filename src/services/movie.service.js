@@ -58,12 +58,21 @@ export const createMovie = async (id, title, release_date, poster) => {
 export const findTopRatedMovies = async () => {
   const { rows } = await pool.query(
     `
-    SELECT m.*, AVG(r.rating) AS promedio_rating, COUNT(r.rating) AS total_reviews
+    SELECT 
+      m.*, 
+      stats.promedio_rating, 
+      stats.total_reviews
     FROM movies m
-    JOIN reviews r ON m.id = r.movie_id
-    GROUP BY m.id, m.title
-    HAVING COUNT(r.rating) >= 1
-    ORDER BY promedio_rating DESC
+    JOIN (
+      SELECT 
+        movie_id, 
+        AVG(rating) AS promedio_rating, 
+        COUNT(rating) AS total_reviews
+      FROM reviews
+      GROUP BY movie_id
+      HAVING COUNT(rating) >= 1
+    ) stats ON stats.movie_id = m.id
+    ORDER BY stats.promedio_rating DESC
     LIMIT 30;
     `
   );
@@ -73,11 +82,18 @@ export const findTopRatedMovies = async () => {
 export const findPopularMovies = async () => {
   const { rows } = await pool.query(
     `
-    SELECT m.*, COUNT(f.user_id) AS total_favs
+    SELECT 
+      m.*, 
+      COALESCE(favs.total_favs, 0) AS total_favs
     FROM movies m
-    JOIN movie_fav f ON m.id = f.movie_id
-    GROUP BY m.id, m.title
-    ORDER BY total_favs DESC
+    JOIN (
+      SELECT 
+        movie_id, 
+        COUNT(user_id) AS total_favs
+      FROM movie_fav
+      GROUP BY movie_id
+    ) favs ON favs.movie_id = m.id
+    ORDER BY favs.total_favs DESC
     LIMIT 30;
     `
   );
@@ -87,13 +103,20 @@ export const findPopularMovies = async () => {
 export const findPopularAmongFollowed = async (userId) => {
   const { rows } = await pool.query(
     `
-    SELECT m.*, COUNT(f.user_id) AS total_favs
+    SELECT 
+      m.*, 
+      COALESCE(favs.total_favs, 0) AS total_favs
     FROM movies m
-    JOIN movie_fav f ON m.id = f.movie_id
-    JOIN following fo ON f.user_id = fo.followed_id
-    WHERE fo.follower_id = $1
-    GROUP BY m.id, m.title
-    ORDER BY total_favs DESC
+    JOIN (
+      SELECT 
+        f.movie_id, 
+        COUNT(f.user_id) AS total_favs
+      FROM movie_fav f
+      JOIN following fo ON f.user_id = fo.followed_id
+      WHERE fo.follower_id = $1
+      GROUP BY f.movie_id
+    ) favs ON favs.movie_id = m.id
+    ORDER BY favs.total_favs DESC
     LIMIT 30;
     `,
     [userId]

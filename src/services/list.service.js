@@ -22,21 +22,27 @@ export const deleteList = async (listId) => {
 export const findListById = async (listId) => {
   const { rows } = await pool.query(
     `
-    SELECT
-    lists.*,
-    json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
-    users.username AS author,
-    (
-      SELECT COUNT(*)
+    SELECT 
+      l.*, 
+      ml.movies,
+      u.username AS author,
+      COALESCE(ls.saved, 0) AS saved
+    FROM lists l
+    LEFT JOIN (
+      SELECT 
+          movie_list.list_id,
+          json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies
+      FROM movie_list
+      LEFT JOIN movies ON movies.id = movie_list.movie_id
+      GROUP BY movie_list.list_id
+    ) ml ON ml.list_id = l.id
+    LEFT JOIN users u ON l.user_id = u.id
+    LEFT JOIN (
+      SELECT list_id, COUNT(*) AS saved
       FROM list_saved
-      WHERE list_saved.list_id = lists.id
-    ) AS saved
-    FROM lists
-    LEFT JOIN movie_list ON movie_list.list_id = lists.id
-    LEFT JOIN movies ON movies.id = movie_list.movie_id
-    LEFT JOIN users ON lists.user_id = users.id
-    WHERE lists.id = $1
-    GROUP BY lists.id, users.username; 
+      GROUP BY list_id
+    ) ls ON ls.list_id = l.id
+    WHERE l.id = $1;
     `,
     [listId]
   );
@@ -141,22 +147,29 @@ export const removeFromSaved = async (userId, listId) => {
 export const findPopularLists = async () => {
   const { rows } = await pool.query(
     `
-    SELECT
-      lists.*,
-      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
-      users.username AS author,
-      (
-        SELECT COUNT(*)
-        FROM list_saved
-        WHERE list_saved.list_id = lists.id
-      ) AS saved
-    FROM lists
-    LEFT JOIN movie_list ON movie_list.list_id = lists.id
-    LEFT JOIN movies ON movies.id = movie_list.movie_id
-    LEFT JOIN users ON lists.user_id = users.id
-    GROUP BY lists.id, users.username, lists.user_id
+    SELECT 
+      l.*, 
+      ml.movies,
+      u.username AS author,
+      COALESCE(ls.saved, 0) AS saved
+    FROM lists l
+    LEFT JOIN (
+      SELECT 
+        movie_list.list_id,
+        json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies
+      FROM movie_list
+      LEFT JOIN movies ON movies.id = movie_list.movie_id
+      GROUP BY movie_list.list_id
+    ) ml ON ml.list_id = l.id
+    LEFT JOIN users u ON l.user_id = u.id
+    LEFT JOIN (
+      SELECT list_id, COUNT(*) AS saved
+      FROM list_saved
+      GROUP BY list_id
+    ) ls ON ls.list_id = l.id
     ORDER BY saved DESC
     LIMIT 10;
+
     `
   );
   return rows;
@@ -165,22 +178,28 @@ export const findPopularLists = async () => {
 export const findFollowedLists = async (userId) => {
   const { rows } = await pool.query(
     `
-    SELECT
-      lists.*,
-      json_agg(movies) FILTER (WHERE movies.id IS NOT NULL) AS movies,
-      users.username AS author,
-      (
-        SELECT COUNT(*)
-        FROM list_saved
-        WHERE list_saved.list_id = lists.id
-      ) AS saved
-    FROM following
-    JOIN lists ON lists.user_id = following.followed_id
-    LEFT JOIN movie_list ON movie_list.list_id = lists.id
-    LEFT JOIN movies ON movies.id = movie_list.movie_id
-    LEFT JOIN users ON lists.user_id = users.id
-    WHERE following.follower_id = $1
-    GROUP BY lists.id, users.username, lists.user_id
+    SELECT 
+      l.*, 
+      ml.movies,
+      u.username AS author,
+      COALESCE(ls.saved, 0) AS saved
+    FROM following f
+    JOIN lists l ON l.user_id = f.followed_id
+    LEFT JOIN (
+      SELECT 
+        movie_list.list_id,
+        json_agg(m) FILTER (WHERE m.id IS NOT NULL) AS movies
+      FROM movie_list
+      LEFT JOIN movies m ON m.id = movie_list.movie_id
+      GROUP BY movie_list.list_id
+    ) ml ON ml.list_id = l.id
+    LEFT JOIN users u ON l.user_id = u.id
+    LEFT JOIN (
+      SELECT list_id, COUNT(*) AS saved
+      FROM list_saved
+      GROUP BY list_id
+    ) ls ON ls.list_id = l.id
+    WHERE f.follower_id = $1
     ORDER BY saved DESC
     LIMIT 10;
     `,
