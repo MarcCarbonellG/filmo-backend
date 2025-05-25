@@ -53,9 +53,7 @@ const loginUser = async (req, res) => {
         .json({ message: "Nombre o contraseña incorrectos" });
     }
 
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ username }, process.env.JWT_SECRET);
     res.json({ message: "Session successfully started", token, user });
   } catch (error) {
     console.error("Error in loginUser:", error);
