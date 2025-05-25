@@ -20,6 +20,7 @@ import {
   removeMovieWatched,
   searchMoviesByTitle,
 } from "../controllers/movie.controller.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -39,19 +40,19 @@ router.get("/following/:userId", getPopularAmongFollowed);
 router.get("/fav/:movie_id", getMovieFavorites);
 
 // Add movie to favorites
-router.post("/fav", addMovieToFavorites);
+router.post("/fav", authMiddleware, addMovieToFavorites);
 
 // Remove movie from favorites
-router.delete("/fav", removeMovieFavorite);
+router.delete("/fav", authMiddleware, removeMovieFavorite);
 
 // Get movie watched array
 router.get("/watched/:movie_id", getMovieWatched);
 
 // Add movie to watched
-router.post("/watched", addMovieToWatched);
+router.post("/watched", authMiddleware, addMovieToWatched);
 
 // Remove movie from watched
-router.delete("/watched", removeMovieWatched);
+router.delete("/watched", authMiddleware, removeMovieWatched);
 
 // Get genres
 router.get("/genres", getGenres);
@@ -63,10 +64,10 @@ router.get("/genres/:movieId", getMovieGenres);
 router.get("/languages", getLanguages);
 
 // Add movie review
-router.post("/review", addMovieReview);
+router.post("/review", authMiddleware, addMovieReview);
 
 // Delete movie review
-router.delete("/review", deleteMovieReview);
+router.delete("/review", authMiddleware, deleteMovieReview);
 
 // Get movie review
 router.get("/review", getMovieReview);
@@ -75,9 +76,9 @@ router.get("/review", getMovieReview);
 router.get("/review/:movie_id", getMovieReviews);
 
 // Create movie recommendation
-router.post("/recommendation", createMovieRecommendation);
+router.post("/recommendation", authMiddleware, createMovieRecommendation);
 
 // Delete movie recommendation
-router.delete("/recommendation", deleteMovieRecommendation);
+router.delete("/recommendation", authMiddleware, deleteMovieRecommendation);
 
 export default router;

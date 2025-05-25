@@ -15,6 +15,7 @@ import {
   getWatchedByUsername,
   unfollowUser,
 } from "../controllers/user.controller.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ const router = express.Router();
 router.get("/:username", getPublicUserByUsername);
 
 // Delete user account by id
-router.delete("/:user_id", deleteUserById);
+router.delete("/:user_id", authMiddleware, deleteUserById);
 
 // Get favorite movies by username
 router.get("/profile/fav/:username", getFavoritesByUsername);
@@ -40,10 +41,10 @@ router.get("/profile/lists/all/:username", getProfileLists);
 router.get("/profile/following", getFollowing);
 
 // Create a following relationship between two users
-router.post("/profile/follow", followUser);
+router.post("/profile/follow", authMiddleware, followUser);
 
 // Delte a following relationship between two users
-router.delete("/profile/unfollow", unfollowUser);
+router.delete("/profile/unfollow", authMiddleware, unfollowUser);
 
 // Get users that an specific user follows
 router.get("/profile/followed/:follower_id([0-9]+)", getFollowed);

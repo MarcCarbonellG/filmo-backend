@@ -13,11 +13,12 @@ import {
   removeMovieFromList,
   updateMovieList,
 } from "../controllers/list.controller.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // Create a new list
-router.post("/", createMovieList);
+router.post("/", authMiddleware, createMovieList);
 
 // Get user lists
 router.get("/", getUserListsWithMovieStatus);
@@ -29,10 +30,10 @@ router.get("/popular", getPopularLists);
 router.get("/followed/:userId", getFollowedLists);
 
 // Adds movie to a list
-router.post("/movie", addMovieToList);
+router.post("/movie", authMiddleware, addMovieToList);
 
 // Removes movie from list
-router.delete("/movie", removeMovieFromList);
+router.delete("/movie", authMiddleware, removeMovieFromList);
 
 // Get list saved
 router.get("/saved", getListSaved);
@@ -47,9 +48,9 @@ router.delete("/saved", removeListSaved);
 router.get("/:listId", getListById);
 
 // Deletes list by id
-router.delete("/:listId", deleteListById);
+router.delete("/:listId", authMiddleware, deleteListById);
 
 // Update list
-router.put("/:listId", updateMovieList);
+router.put("/:listId", authMiddleware, updateMovieList);
 
 export default router;
