@@ -81,7 +81,7 @@ export const findListsByUsername = async (username) => {
     )
     SELECT 
       l.*,
-      ma.movies,
+      COALESCE(ma.movies, '[]'::json) AS movies,
       $1 AS author
     FROM lists l
     JOIN user_lookup u ON l.user_id = u.id
@@ -109,7 +109,7 @@ export const findProfileLists = async (username) => {
     )
     SELECT 
       l.*, 
-      ma.movies, 
+      COALESCE(ma.movies, '[]'::json) AS movies, 
       $1 AS author
     FROM lists l
     JOIN user_lookup u ON l.user_id = u.id
@@ -117,7 +117,7 @@ export const findProfileLists = async (username) => {
     UNION ALL
     SELECT 
       l.*, 
-      ma.movies, 
+      COALESCE(ma.movies, '[]'::json) AS movies, 
       u2.username AS author
     FROM list_saved ls
     JOIN lists l ON l.id = ls.list_id

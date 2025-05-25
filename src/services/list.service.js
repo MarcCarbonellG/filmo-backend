@@ -24,7 +24,7 @@ export const findListById = async (listId) => {
     `
     SELECT 
       l.*, 
-      ml.movies,
+      COALESCE(ml.movies, '[]'::json) AS movies,
       u.username AS author,
       COALESCE(ls.saved, 0) AS saved
     FROM lists l
@@ -149,7 +149,7 @@ export const findPopularLists = async () => {
     `
     SELECT 
       l.*, 
-      ml.movies,
+      COALESCE(ml.movies, '[]'::json) AS movies,
       u.username AS author,
       COALESCE(ls.saved, 0) AS saved
     FROM lists l
@@ -180,7 +180,7 @@ export const findFollowedLists = async (userId) => {
     `
     SELECT 
       l.*, 
-      ml.movies,
+      COALESCE(ml.movies, '[]'::json) AS movies,
       u.username AS author,
       COALESCE(ls.saved, 0) AS saved
     FROM following f
