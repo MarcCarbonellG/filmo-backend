@@ -22,6 +22,7 @@ import {
   removeFavorite,
   removeFromWatched,
 } from "../services/movie.service.js";
+import { getCache, setCache } from "../utils/cache.js";
 
 dotenv.config();
 
@@ -35,6 +36,13 @@ export const searchMoviesByTitle = async (req, res) => {
     return res.status(400).json({ message: "Query parameter is required" });
   }
 
+  const cacheKey = `tmdb:search:${query}`;
+
+  const cachedData = getCache(cacheKey);
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
       params: {
@@ -45,12 +53,15 @@ export const searchMoviesByTitle = async (req, res) => {
       },
     });
 
-    res.json({
+    const data = {
       page: response.data.page,
       movies: response.data.results,
       total_pages: response.data.total_pages,
       total_results: response.data.total_results,
-    });
+    };
+
+    setCache(cacheKey, data, 60);
+    res.json(data);
   } catch (error) {
     console.error("Error in searchMoviesByTitle:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -60,11 +71,19 @@ export const searchMoviesByTitle = async (req, res) => {
 export const getApiMovieById = async (req, res) => {
   const { id } = req.params;
 
+  const cacheKey = `tmdb:movie:${id}`;
+
+  const cachedData = getCache(cacheKey);
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/movie/${id}`, {
       params: { api_key: TMDB_API_KEY, language: "es-ES" },
     });
 
+    setCache(cacheKey, response.data, 60);
     res.json(response.data);
   } catch (error) {
     console.error("Error in getApiMovieById:", error);
@@ -87,22 +106,25 @@ export const getMovieCollection = async (req, res) => {
   try {
     let movies;
 
-    switch (collection) {
-      case "top_rated":
-        movies = await findTopRatedMovies();
-        break;
-      case "popular":
-        movies = await findPopularMovies();
-        break;
-      default:
-        const response = await axios.get(
-          `${TMDB_BASE_URL}/movie/${collection}`,
-          {
-            params: { api_key: TMDB_API_KEY, language: "es-ES" },
-          }
-        );
-        movies = response.data.results;
+    if (collection === "top_rated") {
+      movies = await findTopRatedMovies();
+    } else if (collection === "popular") {
+      movies = await findPopularMovies();
+    } else {
+      const cacheKey = `tmdb:${collection}`;
+
+      const cachedData = getCache(cacheKey);
+      if (cachedData) {
+        return res.json(cachedData);
+      }
+
+      const response = await axios.get(`${TMDB_BASE_URL}/movie/${collection}`, {
+        params: { api_key: TMDB_API_KEY, language: "es-ES" },
+      });
+      movies = response.data.results;
+      setCache(cacheKey, movies, 60);
     }
+
     res.json(movies);
   } catch (error) {
     console.error("Error in getMovieCollection:", error);
@@ -294,11 +316,19 @@ export const removeMovieWatched = async (req, res) => {
 };
 
 export const getGenres = async (req, res) => {
+  const cacheKey = `tmdb:genres`;
+
+  const cachedData = getCache(cacheKey);
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/genre/movie/list`, {
       params: { api_key: TMDB_API_KEY, language: "es-ES" },
     });
 
+    setCache(cacheKey, response.data.genres, 60);
     res.json(response.data.genres);
   } catch (error) {
     console.error("Error fetching genres:", error);
@@ -307,6 +337,13 @@ export const getGenres = async (req, res) => {
 };
 
 export const getLanguages = async (req, res) => {
+  const cacheKey = `tmdb:languages`;
+
+  const cachedData = getCache(cacheKey);
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
   try {
     const response = await axios.get(
       `${TMDB_BASE_URL}/configuration/languages`,
@@ -315,6 +352,7 @@ export const getLanguages = async (req, res) => {
       }
     );
 
+    setCache(cacheKey, response.data, 60);
     res.json(response.data);
   } catch (error) {
     console.error("Error in getLanguages:", error);
@@ -433,11 +471,19 @@ export const getMovieReviews = async (req, res) => {
 export const getMovieGenres = async (req, res) => {
   const { movieId } = req.params;
 
+  const cacheKey = `tmdb:genres:${movieId}`;
+
+  const cachedData = getCache(cacheKey);
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/movie/${movieId}`, {
       params: { api_key: TMDB_API_KEY, language: "es-ES" },
     });
 
+    setCache(cacheKey, { id: movieId, genres: response.data.genres }, 60);
     res.json({ id: movieId, genres: response.data.genres });
   } catch (error) {
     console.error("Error in getMovieGenres:", error);

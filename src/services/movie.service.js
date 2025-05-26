@@ -4,6 +4,8 @@ import pool from "../config/db.js";
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
+import { getCache, setCache } from "../utils/cache.js";
+
 export const isValidMovie = (movie) => {
   const requiredProps = [
     "adult",
@@ -41,9 +43,18 @@ export const findMovieById = async (id) => {
 };
 
 export const findMovieFromApiById = async (id) => {
+  const cacheKey = `tmdb:movie:${id}`;
+
+  const cachedData = getCache(cacheKey);
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
   const response = await axios.get(`${TMDB_BASE_URL}/movie/${id}`, {
     params: { api_key: TMDB_API_KEY, language: "es-ES" },
   });
+
+  setCache(cacheKey, response.data, 60);
   return response.data;
 };
 

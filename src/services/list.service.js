@@ -1,8 +1,5 @@
 import pool from "../config/db.js";
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
-const TMDB_BASE_URL = "https://api.themoviedb.org/3";
-
 export const createList = async (userId, title, description) => {
   const { rows } = await pool.query(
     "INSERT INTO lists (user_id, title, description) VALUES ($1, $2, $3) RETURNING *",
