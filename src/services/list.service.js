@@ -26,6 +26,7 @@ export const findListById = async (listId) => {
       l.*, 
       COALESCE(ml.movies, '[]'::json) AS movies,
       u.username AS author,
+      u.avatar as author_avatar,
       COALESCE(ls.saved, 0) AS saved
     FROM lists l
     LEFT JOIN (
@@ -151,6 +152,7 @@ export const findPopularLists = async () => {
       l.*, 
       COALESCE(ml.movies, '[]'::json) AS movies,
       u.username AS author,
+      u.avatar as author_avatar,
       COALESCE(ls.saved, 0) AS saved
     FROM lists l
     LEFT JOIN (
@@ -182,6 +184,7 @@ export const findFollowedLists = async (userId) => {
       l.*, 
       COALESCE(ml.movies, '[]'::json) AS movies,
       u.username AS author,
+      u.avatar AS author_avatar,
       COALESCE(ls.saved, 0) AS saved
     FROM following f
     JOIN lists l ON l.user_id = f.followed_id

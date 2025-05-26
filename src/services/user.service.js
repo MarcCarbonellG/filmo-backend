@@ -69,7 +69,7 @@ export const findListsByUsername = async (username) => {
   const { rows } = await pool.query(
     `
     WITH user_lookup AS (
-      SELECT id FROM users WHERE username = $1
+      SELECT * FROM users WHERE username = $1
     ),
     movie_agg AS (
       SELECT 
@@ -82,7 +82,8 @@ export const findListsByUsername = async (username) => {
     SELECT 
       l.*,
       COALESCE(ma.movies, '[]'::json) AS movies,
-      $1 AS author
+      $1 AS author,
+      u.avatar as author_avatar
     FROM lists l
     JOIN user_lookup u ON l.user_id = u.id
     LEFT JOIN movie_agg ma ON ma.list_id = l.id
@@ -97,7 +98,7 @@ export const findProfileLists = async (username) => {
   const { rows } = await pool.query(
     `
     WITH user_lookup AS (
-      SELECT id FROM users WHERE username = $1
+      SELECT * FROM users WHERE username = $1
     ),
     movie_agg AS (
       SELECT 
@@ -110,7 +111,8 @@ export const findProfileLists = async (username) => {
     SELECT 
       l.*, 
       COALESCE(ma.movies, '[]'::json) AS movies, 
-      $1 AS author
+      $1 AS author,
+      u.avatar as author_avatar
     FROM lists l
     JOIN user_lookup u ON l.user_id = u.id
     LEFT JOIN movie_agg ma ON ma.list_id = l.id
@@ -118,7 +120,8 @@ export const findProfileLists = async (username) => {
     SELECT 
       l.*, 
       COALESCE(ma.movies, '[]'::json) AS movies, 
-      u2.username AS author
+      u2.username AS author,
+      u2.avatar as author_avatar
     FROM list_saved ls
     JOIN lists l ON l.id = ls.list_id
     JOIN user_lookup u ON ls.user_id = u.id
