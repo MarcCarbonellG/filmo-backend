@@ -24,7 +24,9 @@ export const createMovieList = async (req, res) => {
   const { userId, title, description, movieId } = req.body;
   try {
     if (!userId || !title || !movieId) {
-      return res.status(400).json({ message: "Bad request" });
+      return res
+        .status(400)
+        .json({ message: "User id, title and movie id are required" });
     }
 
     const list = await createList(userId, title, description);
@@ -53,7 +55,7 @@ export const createMovieList = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in createMovieList:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -63,9 +65,7 @@ export const getListById = async (req, res) => {
 
   try {
     if (!listId) {
-      return res
-        .status(400)
-        .json({ message: "Bad request. List id is required" });
+      return res.status(400).json({ message: "List id is required" });
     }
 
     const list = await findListById(listId);
@@ -77,8 +77,8 @@ export const getListById = async (req, res) => {
         ...list,
         page: page ?? 1,
         movies: list.movies.slice((page - 1) * 20, (page - 1) * 20 + 20),
-        total_pages: Math.ceil(list.movies.length / 20),
-        total_results: list.movies.length,
+        totalPages: Math.ceil(list.movies.length / 20),
+        totalResults: list.movies.length,
       });
     }
     res.status(404).json({ message: "List not found" });
@@ -95,7 +95,7 @@ export const getUserListsWithMovieStatus = async (req, res) => {
     if (!userId) {
       return res
         .status(400)
-        .json({ message: "Bad request. User id and movie id are required" });
+        .json({ message: "User id and movie id are required" });
     }
 
     const lists = await findUserListsWithMovieStatus(userId, movieId);
@@ -103,7 +103,7 @@ export const getUserListsWithMovieStatus = async (req, res) => {
     return res.json(lists);
   } catch (error) {
     console.error("Error in getUserListsWithMovieStatus:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -114,7 +114,7 @@ export const addMovieToList = async (req, res) => {
     if (!listId || !movieId) {
       return res
         .status(400)
-        .json({ message: "Bad request. List id and movie id are required" });
+        .json({ message: "List id and movie id are required" });
     }
 
     let movieList = await findMovieListRelation(listId, movieId);
@@ -149,7 +149,7 @@ export const addMovieToList = async (req, res) => {
     }
   } catch (error) {
     console.error("Error in addMovieToList:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -160,7 +160,7 @@ export const removeMovieFromList = async (req, res) => {
     if (!listId || !movieId) {
       return res
         .status(400)
-        .json({ message: "Bad request. List id and movie id are required" });
+        .json({ message: " List id and movie id are required" });
     }
 
     const movieList = await removeFromList(listId, movieId);
@@ -171,7 +171,7 @@ export const removeMovieFromList = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in removeMovieFromList:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -181,7 +181,7 @@ export const deleteListById = async (req, res) => {
   try {
     if (!listId) {
       return res.status(400).json({
-        message: "Bad request. List id is required",
+        message: "List id is required",
       });
     }
 
@@ -193,7 +193,7 @@ export const deleteListById = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in deleteListById:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -213,7 +213,7 @@ export const updateMovieList = async (req, res) => {
     res.json(updatedList);
   } catch (err) {
     console.error("Error in updateMovieList:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(error.status).json({ error: "Internal server error" });
   }
 };
 
@@ -224,15 +224,15 @@ export const getListSaved = async (req, res) => {
     if (!userId || !listId) {
       return res
         .status(400)
-        .json({ message: "Bad request. User id and list id are required" });
+        .json({ message: "User id and list id are required" });
     }
 
-    const list_saved = await findSaved(userId, listId);
+    const listSaved = await findSaved(userId, listId);
 
-    return res.json(list_saved);
+    return res.json(listSaved);
   } catch (error) {
     console.error("Error in getListSaved:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -243,26 +243,26 @@ export const addListToSaved = async (req, res) => {
     if (!userId || !listId) {
       return res
         .status(400)
-        .json({ message: "Bad request. User id and list id are required" });
+        .json({ message: "User id and list id are required" });
     }
 
-    let list_saved = await findSaved(listId);
+    let listSaved = await findSaved(listId);
 
-    if (list_saved) {
+    if (listSaved) {
       return res.status(400).json({
         message: "Selected movie was already in saved",
       });
     } else {
-      list_saved = await addToSaved(userId, listId);
+      listSaved = await addToSaved(userId, listId);
 
       res.status(201).json({
         message: "List successfully added to saved",
-        data: list_saved,
+        data: listSaved,
       });
     }
   } catch (error) {
     console.error("Error in addListToSaved:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -273,18 +273,18 @@ export const removeListSaved = async (req, res) => {
     if (!userId || !listId) {
       return res
         .status(400)
-        .json({ message: "Bad request. User id and list id are required" });
+        .json({ message: "User id and list id are required" });
     }
 
-    const list_saved = await removeFromSaved(userId, listId);
+    const listSaved = await removeFromSaved(userId, listId);
 
     res.status(201).json({
       message: "List successfully removed from saved",
-      data: list_saved,
+      data: listSaved,
     });
   } catch (error) {
     console.error("Error in removeListSaved:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -295,7 +295,7 @@ export const getPopularLists = async (req, res) => {
     res.json(lists);
   } catch (error) {
     console.error("Error in getPopularLists:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -304,9 +304,7 @@ export const getFollowedLists = async (req, res) => {
 
   try {
     if (!userId) {
-      return res
-        .status(400)
-        .json({ message: "Bad request. User id is required" });
+      return res.status(400).json({ message: "User id is required" });
     }
 
     const lists = await findFollowedLists(userId);
@@ -314,6 +312,6 @@ export const getFollowedLists = async (req, res) => {
     res.status(201).json(lists);
   } catch (error) {
     console.error("Error in getFollowedLists:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };

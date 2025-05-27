@@ -28,10 +28,10 @@ export const createUser = async (username, email, hashedPassword) => {
   return rows[0];
 };
 
-export const deleteUser = async (user_id) => {
+export const deleteUser = async (userId) => {
   const { rows } = await pool.query(
     "DELETE FROM users WHERE id = $1 RETURNING *",
-    [user_id]
+    [userId]
   );
 
   return rows[0];

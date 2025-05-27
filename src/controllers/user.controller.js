@@ -20,9 +20,7 @@ export const getPublicUserByUsername = async (req, res) => {
 
   try {
     if (!username) {
-      return res
-        .status(400)
-        .json({ message: "Bad request. Username is required" });
+      return res.status(400).json({ message: "Username is required" });
     }
 
     const user = await findUserByUsername(username);
@@ -38,7 +36,7 @@ export const getPublicUserByUsername = async (req, res) => {
     res.json(publicUserData);
   } catch (error) {
     console.error("Error in getPublicUserByUsername:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -48,9 +46,7 @@ export const getFavoritesByUsername = async (req, res) => {
 
   try {
     if (!username) {
-      return res
-        .status(400)
-        .json({ message: "Bad request. Username is required" });
+      return res.status(400).json({ message: "Username is required" });
     }
 
     const favorites = await findFavsByUsername(username);
@@ -60,12 +56,12 @@ export const getFavoritesByUsername = async (req, res) => {
     res.json({
       page: page ?? 1,
       movies: favorites.slice((page - 1) * 20, (page - 1) * 20 + 20),
-      total_pages: Math.ceil(favorites.length / 20),
-      total_results: favorites.length,
+      totalPages: Math.ceil(favorites.length / 20),
+      totalResults: favorites.length,
     });
   } catch (error) {
     console.error("Error in getFavoritesByUsername:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -75,9 +71,7 @@ export const getWatchedByUsername = async (req, res) => {
 
   try {
     if (!username) {
-      return res
-        .status(400)
-        .json({ message: "Bad request. Username is required" });
+      return res.status(400).json({ message: "Username is required" });
     }
 
     const watched = await findWatchedsByUsername(username);
@@ -87,12 +81,12 @@ export const getWatchedByUsername = async (req, res) => {
     return res.json({
       page: page ?? 1,
       movies: watched.slice((page - 1) * 20, (page - 1) * 20 + 20),
-      total_pages: Math.ceil(watched.length / 20),
-      total_results: watched.length,
+      totalPages: Math.ceil(watched.length / 20),
+      totalResults: watched.length,
     });
   } catch (error) {
     console.error("Error in getWatchedByUsername:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -102,9 +96,7 @@ export const getListsByUsername = async (req, res) => {
 
   try {
     if (!username) {
-      return res
-        .status(400)
-        .json({ message: "Bad request. Username is required" });
+      return res.status(400).json({ message: "Username is required" });
     }
 
     const lists = await findListsByUsername(username);
@@ -114,12 +106,12 @@ export const getListsByUsername = async (req, res) => {
     return res.json({
       page: page ?? 1,
       lists: lists.slice((page - 1) * 5, (page - 1) * 5 + 5),
-      total_pages: Math.ceil(lists.length / 5),
-      total_results: lists.length,
+      totalPages: Math.ceil(lists.length / 5),
+      totalResults: lists.length,
     });
   } catch (error) {
     console.error("Error in getListsByUsername:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -129,9 +121,7 @@ export const getProfileLists = async (req, res) => {
 
   try {
     if (!username) {
-      return res
-        .status(400)
-        .json({ message: "Bad request. Username is required" });
+      return res.status(400).json({ message: "Username is required" });
     }
 
     const lists = await findProfileLists(username);
@@ -141,45 +131,45 @@ export const getProfileLists = async (req, res) => {
     return res.json({
       page: page ?? 1,
       lists: lists.slice((page - 1) * 5, (page - 1) * 5 + 5),
-      total_pages: Math.ceil(lists.length / 5),
-      total_results: lists.length,
+      totalPages: Math.ceil(lists.length / 5),
+      totalResults: lists.length,
     });
   } catch (error) {
     console.error("Error in getProfileLists:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
 export const getFollowing = async (req, res) => {
-  let { follower_id, followed_id } = req.query;
+  let { followerId, followedId } = req.query;
 
   try {
-    if (!follower_id || !followed_id) {
+    if (!followerId || !followedId) {
       return res.status(400).json({
-        message: "Bad request. Follower and followed ids are required",
+        message: "Follower and followed ids are required",
       });
     }
 
-    const following = await findFollowing(follower_id, followed_id);
+    const following = await findFollowing(followerId, followedId);
 
     return res.json(following);
   } catch (error) {
     console.error("Error in getFollowing:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
 export const followUser = async (req, res) => {
-  let { follower_id, followed_id } = req.body;
+  let { followerId, followedId } = req.body;
 
   try {
-    if (!follower_id || !followed_id) {
+    if (!followerId || !followedId) {
       return res.status(400).json({
-        message: "Bad request. Follower and followed ids are required",
+        message: "Follower and followed ids are required",
       });
     }
 
-    let following = await findFollowing(follower_id, followed_id);
+    let following = await findFollowing(followerId, followedId);
 
     if (following) {
       return res.status(400).json({
@@ -187,7 +177,7 @@ export const followUser = async (req, res) => {
       });
     }
 
-    following = await createFollowing(follower_id, followed_id);
+    following = await createFollowing(followerId, followedId);
 
     res.json(following);
   } catch (error) {
@@ -201,83 +191,83 @@ export const followUser = async (req, res) => {
         .json({ message: "A user can not be followed by himself" });
     }
     console.error("Error in followUser:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
 export const unfollowUser = async (req, res) => {
-  let { follower_id, followed_id } = req.body;
+  let { followerId, followedId } = req.body;
 
   try {
-    if (!follower_id || !followed_id) {
+    if (!followerId || !followedId) {
       return res.status(400).json({
-        message: "Bad request. Follower and followed ids are required",
+        message: "Follower and followed ids are required",
       });
     }
 
-    const following = await deleteFollowing(follower_id, followed_id);
+    const following = await deleteFollowing(followerId, followedId);
 
     res.json(following);
   } catch (error) {
     console.error("Error in unfollowUser:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
 export const getFollowed = async (req, res) => {
-  let { follower_id } = req.params;
+  let { followerId } = req.params;
 
   try {
-    if (!follower_id) {
+    if (!followerId) {
       return res.status(400).json({
-        message: "Bad request. Follower id is required",
+        message: "Follower id is required",
       });
     }
 
-    const followed = await findFollowed(follower_id);
+    const followed = await findFollowed(followerId);
 
     return res.json(followed);
   } catch (error) {
     console.error("Error in getFollowed:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
 export const getFollowers = async (req, res) => {
-  let { followed_id } = req.params;
+  let { followedId } = req.params;
 
   try {
-    if (!followed_id) {
+    if (!followedId) {
       return res.status(400).json({
-        message: "Bad request. Followed id is required",
+        message: "Followed id is required",
       });
     }
 
-    const followers = await findFollowers(followed_id);
+    const followers = await findFollowers(followedId);
 
     return res.json(followers);
   } catch (error) {
     console.error("Error in getFollowers:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
 export const deleteUserById = async (req, res) => {
-  let { user_id } = req.params;
+  let { userId } = req.params;
 
   try {
-    if (!user_id) {
+    if (!userId) {
       return res.status(400).json({
-        message: "Bad request. User id is required",
+        message: "User id is required",
       });
     }
 
-    const deletedUser = await deleteUser(user_id);
+    const deletedUser = await deleteUser(userId);
 
     return res.json(deletedUser);
   } catch (error) {
     console.error("Error in deleteUserById:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -287,7 +277,7 @@ export const getFriends = async (req, res) => {
   try {
     if (!userId) {
       return res.status(400).json({
-        message: "Bad request. User id is required",
+        message: "User id is required",
       });
     }
 
@@ -296,7 +286,7 @@ export const getFriends = async (req, res) => {
     return res.json(friends);
   } catch (error) {
     console.error("Error in getFriends:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -306,7 +296,7 @@ export const getUserReviews = async (req, res) => {
   try {
     if (!userId) {
       return res.status(400).json({
-        message: "Bad request. User id is required",
+        message: "User id is required",
       });
     }
 
@@ -315,7 +305,7 @@ export const getUserReviews = async (req, res) => {
     return res.json(reviews);
   } catch (error) {
     console.error("Error in getUserReviews:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
@@ -325,7 +315,7 @@ export const getUserRecommendations = async (req, res) => {
   try {
     if (!userId) {
       return res.status(400).json({
-        message: "Bad request. User id is required",
+        message: "User id is required",
       });
     }
 
@@ -334,6 +324,6 @@ export const getUserRecommendations = async (req, res) => {
     return res.json(recommendations);
   } catch (error) {
     console.error("Error in getUserRecommendations:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };

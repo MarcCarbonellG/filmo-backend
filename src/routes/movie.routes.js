@@ -37,7 +37,7 @@ router.get("/collection/:collection?", getMovieCollection);
 router.get("/following/:userId", getPopularAmongFollowed);
 
 // Get movie favorites
-router.get("/fav/:movie_id", getMovieFavorites);
+router.get("/fav/:movieId", getMovieFavorites);
 
 // Add movie to favorites
 router.post("/fav", authMiddleware, addMovieToFavorites);
@@ -46,7 +46,7 @@ router.post("/fav", authMiddleware, addMovieToFavorites);
 router.delete("/fav", authMiddleware, removeMovieFavorite);
 
 // Get movie watched array
-router.get("/watched/:movie_id", getMovieWatched);
+router.get("/watched/:movieId", getMovieWatched);
 
 // Add movie to watched
 router.post("/watched", authMiddleware, addMovieToWatched);
@@ -73,7 +73,7 @@ router.delete("/review", authMiddleware, deleteMovieReview);
 router.get("/review", getMovieReview);
 
 // Get reviews of an specific movie
-router.get("/review/:movie_id", getMovieReviews);
+router.get("/review/:movieId", getMovieReviews);
 
 // Create movie recommendation
 router.post("/recommendation", authMiddleware, createMovieRecommendation);

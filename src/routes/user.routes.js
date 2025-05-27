@@ -23,7 +23,7 @@ const router = express.Router();
 router.get("/:username", getPublicUserByUsername);
 
 // Delete user account by id
-router.delete("/:user_id", authMiddleware, deleteUserById);
+router.delete("/:userId", authMiddleware, deleteUserById);
 
 // Get favorite movies by username
 router.get("/profile/fav/:username", getFavoritesByUsername);
@@ -47,10 +47,10 @@ router.post("/profile/follow", authMiddleware, followUser);
 router.delete("/profile/unfollow", authMiddleware, unfollowUser);
 
 // Get users that an specific user follows
-router.get("/profile/followed/:follower_id([0-9]+)", getFollowed);
+router.get("/profile/followed/:followerId([0-9]+)", getFollowed);
 
 // Get users that follow an specific user
-router.get("/profile/followers/:followed_id([0-9]+)", getFollowers);
+router.get("/profile/followers/:followedId([0-9]+)", getFollowers);
 
 // Get users that follow an specific user
 router.get("/profile/friends/:userId", getFriends);

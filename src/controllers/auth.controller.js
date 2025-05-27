@@ -18,11 +18,15 @@ const registerUser = async (req, res) => {
     if (await findUserByEmail(email)) {
       return res.status(400).json({
         message: "The email provided is already associated with an account",
+        userMessage: "El email proporcionado ya está asociado a una cuenta",
       });
     }
 
     if (await findUserByUsername(username)) {
-      return res.status(400).json({ message: "Username not available" });
+      return res.status(400).json({
+        message: "Username not available",
+        userMessage: "Nombre de usuario no disponible",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -33,7 +37,10 @@ const registerUser = async (req, res) => {
       .json({ message: "User successfully registered", data: user });
   } catch (error) {
     console.error("Error in registerUser:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({
+      message: "Internal server error",
+      userMessage: "Error en el registro",
+    });
   }
 };
 
@@ -48,16 +55,22 @@ const loginUser = async (req, res) => {
 
     const user = await findUserByUsername(username);
     if (!user || !(await bcrypt.compare(password, user?.password))) {
-      return res
-        .status(401)
-        .json({ message: "Nombre o contraseña incorrectos" });
+      return res.status(401).json({
+        message: "Incorrect username or password",
+        userMessage: "Nombre o contraseña incorrectos",
+      });
     }
 
     const token = jwt.sign({ username }, process.env.JWT_SECRET);
     res.json({ message: "Session successfully started", token, user });
   } catch (error) {
     console.error("Error in loginUser:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res
+      .status(error.status)
+      .json({
+        message: "Internal server error",
+        userMessage: "Error al iniciar sesión",
+      });
   }
 };
 

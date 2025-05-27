@@ -58,10 +58,10 @@ export const findMovieFromApiById = async (id) => {
   return response.data;
 };
 
-export const createMovie = async (id, title, release_date, poster) => {
+export const createMovie = async (id, title, releaseDate, poster) => {
   const { rows } = await pool.query(
     "INSERT INTO movies (id, title, release_date, poster_path) VALUES ($1, $2, $3, $4)",
-    [id, title, release_date, poster]
+    [id, title, releaseDate, poster]
   );
   return rows[0];
 };
@@ -143,97 +143,97 @@ export const findFavorites = async (movie_id) => {
   return rows;
 };
 
-export const findFavorite = async (user_id, movie_id) => {
+export const findFavorite = async (userId, movieId) => {
   const { rows } = await pool.query(
     "SELECT * FROM movie_fav WHERE user_id = $1 AND movie_id = $2",
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const addToFavorites = async (user_id, movie_id) => {
+export const addToFavorites = async (userId, movieId) => {
   const { rows } = await pool.query(
     "INSERT INTO movie_fav (user_id, movie_id) VALUES ($1, $2) RETURNING *",
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const removeFavorite = async (user_id, movie_id) => {
+export const removeFavorite = async (userId, movieId) => {
   const { rows } = await pool.query(
     "DELETE FROM movie_fav WHERE user_id = $1 AND movie_id = $2 RETURNING *",
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const findWatchedArray = async (movie_id) => {
+export const findWatchedArray = async (movieId) => {
   const { rows } = await pool.query(
     "SELECT * FROM movie_watched WHERE movie_id = $1",
-    [movie_id]
+    [movieId]
   );
   return rows;
 };
 
-export const findWatched = async (user_id, movie_id) => {
+export const findWatched = async (userId, movieId) => {
   const { rows } = await pool.query(
     "SELECT * FROM movie_watched WHERE user_id = $1 AND movie_id = $2",
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const addToWatched = async (user_id, movie_id) => {
+export const addToWatched = async (userId, movieId) => {
   const { rows } = await pool.query(
     "INSERT INTO movie_watched (user_id, movie_id) VALUES ($1, $2) RETURNING *",
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const removeFromWatched = async (user_id, movie_id) => {
+export const removeFromWatched = async (userId, movieId) => {
   const { rows } = await pool.query(
     "DELETE FROM movie_watched WHERE user_id = $1 AND movie_id = $2 RETURNING *",
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const findReview = async (user_id, movie_id) => {
+export const findReview = async (userId, movieId) => {
   const { rows } = await pool.query(
     `
     SELECT reviews.*, users.username, users.avatar
     FROM reviews
     JOIN users ON reviews.user_id = users.id
     WHERE reviews.user_id = $1 AND reviews.movie_id = $2`,
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const addReview = async (user_id, movie_id, rating, content) => {
+export const addReview = async (userId, movieId, rating, content) => {
   const { rows } = await pool.query(
     "INSERT INTO reviews (user_id, movie_id, rating, content) VALUES ($1, $2, $3, $4) RETURNING *",
-    [user_id, movie_id, rating, content]
+    [userId, movieId, rating, content]
   );
   return rows[0];
 };
 
-export const deleteReview = async (user_id, movie_id) => {
+export const deleteReview = async (userId, movieId) => {
   const { rows } = await pool.query(
     "DELETE FROM reviews WHERE user_id = $1 AND movie_id = $2 RETURNING *",
-    [user_id, movie_id]
+    [userId, movieId]
   );
   return rows[0];
 };
 
-export const findReviews = async (movie_id) => {
+export const findReviews = async (movieId) => {
   const { rows } = await pool.query(
     `
     SELECT reviews.*, users.username, users.avatar
     FROM reviews JOIN users ON reviews.user_id = users.id
     WHERE reviews.movie_id = $1`,
-    [movie_id]
+    [movieId]
   );
   return rows;
 };
