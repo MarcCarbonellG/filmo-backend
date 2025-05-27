@@ -47,7 +47,7 @@ export const findMovieFromApiById = async (id) => {
 
   const cachedData = getCache(cacheKey);
   if (cachedData) {
-    return res.json(cachedData);
+    return cachedData;
   }
 
   const response = await axios.get(`${TMDB_BASE_URL}/movie/${id}`, {
