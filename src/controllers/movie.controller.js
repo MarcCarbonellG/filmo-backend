@@ -87,7 +87,7 @@ export const getApiMovieById = async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.error("Error in getApiMovieById:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 

@@ -70,18 +70,21 @@ export const getListById = async (req, res) => {
 
     const list = await findListById(listId);
 
-    page ??= 1;
+    if (list) {
+      page ??= 1;
 
-    return res.json({
-      ...list,
-      page: page ?? 1,
-      movies: list.movies.slice((page - 1) * 20, (page - 1) * 20 + 20),
-      total_pages: Math.ceil(list.movies.length / 20),
-      total_results: list.movies.length,
-    });
+      return res.json({
+        ...list,
+        page: page ?? 1,
+        movies: list.movies.slice((page - 1) * 20, (page - 1) * 20 + 20),
+        total_pages: Math.ceil(list.movies.length / 20),
+        total_results: list.movies.length,
+      });
+    }
+    res.status(404).json({ message: "List not found" });
   } catch (error) {
     console.error("Error in getListById:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
