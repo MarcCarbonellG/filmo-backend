@@ -13,16 +13,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Rutas de autenticación
 app.use("/api/auth", authRoutes);
 
-// Rutas de películas
 app.use("/api/movie", movieRoutes);
 
-// Rutas de usuarios
 app.use("/api/user", userRoutes);
 
-// Rutas de listas
 app.use("/api/list", listRoutes);
 
 const PORT = process.env.PORT || 3000;

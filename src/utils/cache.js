@@ -1,4 +1,3 @@
-// cache.js
 const cache = new Map();
 
 function setCache(key, data, ttl = 60) {
