@@ -24,9 +24,9 @@ export const createMovieList = async (req, res) => {
   const { userId, title, description, movieId } = req.body;
   try {
     if (!userId || !title || !movieId) {
-      return res
-        .status(400)
-        .json({ message: "User id, title and movie id are required" });
+      return res.status(400).json({
+        message: "User id, title and movie id are required",
+      });
     }
 
     const list = await createList(userId, title, description);
@@ -112,9 +112,9 @@ export const addMovieToList = async (req, res) => {
 
   try {
     if (!listId || !movieId) {
-      return res
-        .status(400)
-        .json({ message: "List id and movie id are required" });
+      return res.status(400).json({
+        message: "List id and movie id are required",
+      });
     }
 
     let movieList = await findMovieListRelation(listId, movieId);
@@ -149,7 +149,7 @@ export const addMovieToList = async (req, res) => {
     }
   } catch (error) {
     console.error("Error in addMovieToList:", error);
-    res.status(error.status || 500).json({ message: "Internal server error" });
+    res.status(error.status).json({ message: "Internal server error" });
   }
 };
 
