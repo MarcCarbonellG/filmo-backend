@@ -136,7 +136,7 @@ export const addMovieToList = async (req, res) => {
             movieData.poster_path
           );
         } else {
-          res.status(404).json({ message: "Movie not found" });
+          return res.status(404).json({ message: "Movie not found" });
         }
       }
 
@@ -149,7 +149,7 @@ export const addMovieToList = async (req, res) => {
     }
   } catch (error) {
     console.error("Error in addMovieToList:", error);
-    res.status(error.status).json({ message: "Internal server error" });
+    res.status(error.status || 500).json({ message: "Internal server error" });
   }
 };
 
