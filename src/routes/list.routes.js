@@ -38,10 +38,10 @@ router.delete("/movie", authMiddleware, removeMovieFromList);
 // Get list saved
 router.get("/saved", getListSaved);
 
-// Add movie to saved
+// Add list to saved
 router.post("/saved", addListToSaved);
 
-// Remove movie from saved
+// Remove list from saved
 router.delete("/saved", removeListSaved);
 
 // Get list by id

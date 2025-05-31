@@ -52,7 +52,7 @@ router.get("/profile/followed/:followerId([0-9]+)", getFollowed);
 // Get users that follow an specific user
 router.get("/profile/followers/:followedId([0-9]+)", getFollowers);
 
-// Get users that follow an specific user
+// Get users that follow and are followed by an specific user
 router.get("/profile/friends/:userId", getFriends);
 
 // Get user reviews
