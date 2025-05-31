@@ -43,6 +43,8 @@ export const searchMoviesByTitle = async (req, res) => {
     return res.json(cachedData);
   }
 
+  console.log(page);
+
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
       params: {
