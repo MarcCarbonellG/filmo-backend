@@ -32,11 +32,13 @@ const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 export const searchMoviesByTitle = async (req, res) => {
   const { query, page } = req.query;
 
-  if (!query) {
-    return res.status(400).json({ message: "Query parameter is required" });
+  if (!query || !page) {
+    return res
+      .status(400)
+      .json({ message: "Query and page parameters are required" });
   }
 
-  const cacheKey = `tmdb:search:${query}`;
+  const cacheKey = `tmdb:search:${query}:${page}`;
 
   const cachedData = getCache(cacheKey);
   if (cachedData) {
